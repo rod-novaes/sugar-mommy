@@ -1,0 +1,73 @@
+{
+  "config": {
+    "dataInicio": "2026-05-11",
+    "dataFim": "2026-12-27",
+    "minutosSessao": 60,
+    "questoesSessao": 15,
+    "sessoesSemana": 21
+  },
+  "materias": [
+    {
+      "id": "1778531288165",
+      "nome": "Auditoria",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600",
+      "manutencao": "12"
+    },
+    {
+      "id": "1778531311423",
+      "nome": "Contabilidade Geral",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600",
+      "manutencao": "12"
+    },
+    {
+      "id": "1778531331623",
+      "nome": "Direito Financeiro",
+      "peso": "2",
+      "sessoes": "45",
+      "questoes": "400",
+      "manutencao": "6"
+    }
+  ],
+  "registros": [
+    {
+      "id": "1778531355704",
+      "data": "2026-05-11",
+      "idMateria": "1778531288165",
+      "sessoes": "2",
+      "questoes": "50",
+      "manutencao": "0",
+      "comentario": ""
+    },
+    {
+      "id": "1778531376448",
+      "data": "2026-05-12",
+      "idMateria": "1778531288165",
+      "sessoes": "3",
+      "questoes": "0",
+      "manutencao": "0",
+      "comentario": ""
+    },
+    {
+      "id": "1778531398375",
+      "data": "2026-05-12",
+      "idMateria": "1778531331623",
+      "sessoes": "1",
+      "questoes": "0",
+      "manutencao": "0",
+      "comentario": ""
+    },
+    {
+      "id": "1778531468930",
+      "data": "2026-05-13",
+      "idMateria": "1778531311423",
+      "sessoes": "3",
+      "questoes": "0",
+      "manutencao": "0",
+      "comentario": ""
+    }
+  ]
+}

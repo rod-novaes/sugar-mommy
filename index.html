@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<!-- ====================================================================== -->
+<!-- CAPÍTULO 1: HEAD & META -->
+<!-- Configurações básicas da página, links para fontes, ícones e CSS externo -->
+<!-- ====================================================================== -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planner de Estudos</title>
+
+    <!-- Fontes: Google Fonts (Inter) para um design limpo e moderno -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Ícones: Google Material Symbols (Outlined) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+    <!-- Estilos da Aplicação -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Contêiner principal que engloba toda a aplicação (SPA) -->
+    <div id="app-container">
+
+        <!-- ====================================================================== -->
+        <!-- CAPÍTULO 2: HEADER (BARRA SUPERIOR) -->
+        <!-- Barra superior contendo a marca e o menu de controle de arquivos -->
+        <!-- ====================================================================== -->
+        <header id="top-header">
+            <div class="brand">
+                <span class="material-symbols-outlined icon-brand">school</span>
+                <h1>Projeto Sugar Mommy</h1>
+            </div>
+            
+            <div class="toolbar">
+                <button class="btn btn-icon" id="btn-novo" title="Criar Novo Plano">
+                    <span class="material-symbols-outlined">note_add</span>
+                    Novo
+                </button>
+                <button class="btn btn-icon" id="btn-abrir" title="Abrir Plano (JSON)">
+                    <span class="material-symbols-outlined">folder_open</span>
+                    Abrir
+                </button>
+                <button class="btn btn-primary btn-icon" id="btn-salvar" title="Salvar Backup (JSON)">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar Rascunho
+                </button>
+            </div>
+        </header>
+
+        <!-- Contêiner inferior que divide o menu lateral da área de conteúdo -->
+        <div id="app-body">
+
+            <!-- ====================================================================== -->
+            <!-- CAPÍTULO 3: SIDEBAR (MENU LATERAL) -->
+            <!-- Navegação principal para as telas da aplicação -->
+            <!-- ====================================================================== -->
+            <nav id="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-target="view-dashboard">
+                        <span class="material-symbols-outlined">dashboard</span>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="nav-item" data-target="view-schedule">
+                        <span class="material-symbols-outlined">calendar_month</span>
+                        <span>Cronograma</span>
+                    </li>
+                    <li class="nav-item" data-target="view-plan">
+                        <span class="material-symbols-outlined">format_list_numbered</span>
+                        <span>Meu Plano (Fila)</span>
+                    </li>
+                    <li class="nav-item" data-target="view-diary">
+                        <span class="material-symbols-outlined">edit_calendar</span>
+                        <span>Diário de Estudos</span>
+                    </li>
+                    <li class="nav-item" data-target="view-config">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span>Configurações</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- ====================================================================== -->
+            <!-- CAPÍTULO 4: MAIN CONTENT (ÁREA PRINCIPAL) -->
+            <!-- É aqui que as telas (Views) serão alternadas pelo JavaScript -->
+            <!-- ====================================================================== -->
+            <main id="main-content">
+
+                <!-- ----------------------------------------------------------- -->
+                <!-- SEÇÃO 4.1: VIEW DASHBOARD -->
+                <!-- Tela inicial com resumo, viabilidade e gráficos -->
+                <!-- ----------------------------------------------------------- -->
+                <section id="view-dashboard" class="view active">
+                    <header class="view-header">
+                        <h2>Dashboard</h2>
+                        <p class="subtitle">Visão geral do seu progresso e métricas de desempenho.</p>
+                    </header>
+
+                    <div class="dashboard-grid">
+                        <!-- Cards de Resumo Rápido -->
+                        <div class="card summary-card">
+                            <h3>Progresso Geral</h3>
+                            <div class="metric">0,00%</div>
+                            <span class="label">da teoria executada</span>
+                        </div>
+                        <div class="card summary-card status-good">
+                            <h3>Matérias Finalizadas</h3>
+                            <div class="metric">0</div>
+                            <span class="label">no ciclo de manutenção</span>
+                        </div>
+                        <div class="card summary-card">
+                            <h3>Semanas Restantes</h3>
+                            <div class="metric">0</div>
+                            <span class="label">Semanas à frente</span>
+                        </div>
+
+                        <!-- Espaços para os Gráficos -->
+                        <div class="card chart-card full-width">
+                            <h3>Últimos Dias Estudados</h3>
+                            <div class="chart-placeholder">Gráfico de Linha Aqui</div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Sessões Feitas por Matéria</h3>
+                            <div class="chart-placeholder">Gráfico de Pizza Aqui</div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Teoria: Planejado x Realizado</h3>
+                            <div class="chart-placeholder">Barra de Progresso Aqui</div>
+                        </div>
+                        <div class="card chart-card">
+                            <h3>Questões: Planejadas x Respondidas</h3>
+                            <div class="chart-placeholder">Barra de Progresso Aqui</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ----------------------------------------------------------- -->
+                <!-- SEÇÃO 4.2: VIEW CRONOGRAMA (NOVO) -->
+                <!-- Interface passiva para o usuário apenas executar as sessões -->
+                <!-- ----------------------------------------------------------- -->
+                <section id="view-schedule" class="view hidden">
+                    <header class="view-header flex-between">
+                        <div>
+                            <h2>Cronograma de Estudos</h2>
+                            <p class="subtitle">Sua fila inteligente. Apenas sente, cumpra o foco de hoje e marque como feito.</p>
+                        </div>
+                        <button class="btn btn-secondary" id="btn-regerar-cronograma" title="Força o recálculo da fila">
+                            <span class="material-symbols-outlined">refresh</span> Atualizar Fila
+                        </button>
+                    </header>
+
+                    <!-- Foco de Hoje (Botões de Ação Grandes) -->
+                    <div class="schedule-today-section mb-3">
+                        <h3 class="section-title" id="lbl-dia-hoje">Foco de Hoje</h3>
+                        <div id="hoje-slots-container" class="slots-grid">
+                            <!-- Os blocos do dia (Teoria, Questões ou Manutenção) serão injetados aqui -->
+                            <div class="empty-state card text-center full-width">
+                                Gere seu cronograma nas configurações para ver o seu dia.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visão da Semana (Previsibilidade) -->
+                    <div class="schedule-week-section">
+                        <h3 class="section-title">Previsão da Semana Atual</h3>
+                        <div class="card table-container">
+                            <table id="tabela-semana">
+                                <thead>
+                                    <tr>
+                                        <th>Dia da Semana</th>
+                                        <th>Tipo de Dia</th>
+                                        <th>Fila de Sessões Previstas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Dias da semana injetados via JS -->
+                                    <tr class="empty-state">
+                                        <td colspan="3" class="text-center">Cronograma ainda não gerado.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ----------------------------------------------------------- -->
+                <!-- SEÇÃO 4.3: VIEW MEU PLANO (FILA DE PRODUÇÃO) -->
+                <!-- Gestão das matérias com Drag and Drop para definir prioridade -->
+                <!-- ----------------------------------------------------------- -->
+                <section id="view-plan" class="view hidden">
+                    <header class="view-header flex-between">
+                        <div>
+                            <h2>Meu Plano (Fila de Matérias)</h2>
+                            <p class="subtitle">Cadastre suas matérias e arraste (☰) para definir a ordem de prioridade na fila.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-add-materia">
+                            <span class="material-symbols-outlined">add</span> Nova Matéria
+                        </button>
+                    </header>
+
+                    <div class="card table-container">
+                        <table id="tabela-materias">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"></th> <!-- Coluna do Drag Handle -->
+                                    <th>Matéria</th>
+                                    <th>Peso</th>
+                                    <th>Sessões de Teoria</th>
+                                    <th>Nº de Questões</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <!-- O Tbody usará drag and drop nativo ou interativo via JS -->
+                            <tbody id="lista-materias-drag">
+                                <tr class="empty-state">
+                                    <td colspan="6" class="text-center">Nenhuma matéria cadastrada ainda. Clique em "Nova Matéria" para começar.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ----------------------------------------------------------- -->
+                <!-- SEÇÃO 4.4: VIEW DIÁRIO DE ESTUDOS -->
+                <!-- Formulário de registro diário e histórico -->
+                <!-- ----------------------------------------------------------- -->
+                <section id="view-diary" class="view hidden">
+                    <header class="view-header flex-between">
+                        <div>
+                            <h2>Diário de Estudos</h2>
+                            <p class="subtitle">Histórico de suas atividades. O cronograma se ajusta com base nisso.</p>
+                        </div>
+                        <button class="btn btn-primary" id="btn-add-registro">
+                            <span class="material-symbols-outlined">add</span> Registro Manual
+                        </button>
+                    </header>
+
+                    <div class="card table-container">
+                        <table id="tabela-historico">
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Matéria</th>
+                                    <th>Sessões (Teoria)</th>
+                                    <th>Questões</th>
+                                    <th>Manutenção</th>
+                                    <th>Comentário</th>
+                                    <th class="text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="empty-state">
+                                    <td colspan="7" class="text-center">Nenhum estudo registrado ainda.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ----------------------------------------------------------- -->
+                <!-- SEÇÃO 4.5: VIEW CONFIGURAÇÕES (ASSISTENTE WIZARD) -->
+                <!-- Parâmetros que guiam o motor lógico do cronograma -->
+                <!-- ----------------------------------------------------------- -->
+                <section id="view-config" class="view hidden">
+                    <header class="view-header">
+                        <h2>Assistente de Configuração</h2>
+                        <p class="subtitle">Defina as regras do jogo. A <strong>Sugar Mommy</strong> fará as contas por você.</p>
+                    </header>
+
+                    <form id="form-config" onsubmit="event.preventDefault();">
+                        
+                        <!-- Passo 1: Limites e Ritmo -->
+                        <div class="card">
+                            <h3 class="form-section-title" style="margin-top: 0;">Passo 1: Ritmo e Limites</h3>
+                            <div class="form-row">
+                                <div class="form-group stretch">
+                                    <label for="cfg-data-inicio">Data de Início do Plano</label>
+                                    <input type="date" id="cfg-data-inicio" required>
+                                </div>
+                                <div class="form-group stretch">
+                                    <label for="cfg-data-fim">Data de Fim do Plano</label>
+                                    <input type="date" id="cfg-data-fim" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group stretch">
+                                    <label for="cfg-max-materias">Máximo de Matérias Simultâneas (Teoria):</label>
+                                    <input type="number" id="cfg-max-materias" min="1" max="3" value="3" required title="Recomendado: 2 ou 3 para não diluir o foco">
+                                    <small style="color: var(--text-muted); font-size: 12px;">Defina entre 1 e 3 matérias ao mesmo tempo.</small>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group stretch">
+                                    <label for="cfg-minutos-sessao">Uma sessão de Teoria/Manutenção equivale a (minutos):</label>
+                                    <input type="number" id="cfg-minutos-sessao" min="1" value="60" required>
+                                </div>
+                                <div class="form-group stretch">
+                                    <label for="cfg-questoes-sessao">Questões inéditas esperadas por sessão:</label>
+                                    <input type="number" id="cfg-questoes-sessao" min="1" value="15" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Passo 2: A Matriz Semanal -->
+                        <div class="card">
+                            <h3 class="form-section-title" style="margin-top: 0;">Passo 2: Sua Matriz Semanal</h3>
+                            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
+                                Distribua seus dias definindo o <strong>Tipo de Dia</strong> (Teoria, Questões, Manutenção, Descanso) e quantos <strong>Slots (Sessões)</strong> você fará. A ordem cronológica ideal é Teoria &rarr; Questões &rarr; Manutenção.
+                            </p>
+
+                            <!-- Segunda -->
+                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="width: 120px; font-weight: 500;">Segunda-feira</div>
+                                <div class="form-group stretch">
+                                    <label>Tipo de Dia</label>
+                                    <select id="cfg-seg-tipo" class="matriz-tipo">
+                                        <option value="teoria" selected>Teoria</option>
+                                        <option value="questoes">Questões</option>
+                                        <option value="manutencao">Manutenção</option>
+                                        <option value="descanso">Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Qtd. de Slots</label>
+                                    <input type="number" id="cfg-seg-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Terça -->
+                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="width: 120px; font-weight: 500;">Terça-feira</div>
+                                <div class="form-group stretch">
+                                    <label class="hidden">Tipo de Dia</label> <!-- Oculto visualmente no desktop para alinhar, mantendo acessibilidade -->
+                                    <select id="cfg-ter-tipo" class="matriz-tipo">
+                                        <option value="teoria" selected>Teoria</option>
+                                        <option value="questoes">Questões</option>
+                                        <option value="manutencao">Manutenção</option>
+                                        <option value="descanso">Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="hidden">Qtd. de Slots</label>
+                                    <input type="number" id="cfg-ter-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Quarta -->
+                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="width: 120px; font-weight: 500;">Quarta-feira</div>
+                                <div class="form-group stretch">
+                                    <select id="cfg-qua-tipo" class="matriz-tipo">
+                                        <option value="teoria" selected>Teoria</option>
+                                        <option value="questoes">Questões</option>
+                                        <option value="manutencao">Manutenção</option>
+                                        <option value="descanso">Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="cfg-qua-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Quinta -->
+                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="width: 120px; font-weight: 500;">Quinta-feira</div>
+                                <div class="form-group stretch">
+                                    <select id="cfg-qui-tipo" class="matriz-tipo">
+                                        <option value="teoria" selected>Teoria</option>
+                                        <option value="questoes">Questões</option>
+                                        <option value="manutencao">Manutenção</option>
+                                        <option value="descanso">Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="cfg-qui-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Sexta -->
+                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="width: 120px; font-weight: 500;">Sexta-feira</div>
+                                <div class="form-group stretch">
+                                    <select id="cfg-sex-tipo" class="matriz-tipo">
+                                        <option value="teoria">Teoria</option>
+                                        <option value="questoes" selected>Questões</option>
+                                        <option value="manutencao">Manutenção</option>
+                                        <option value="descanso">Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="cfg-sex-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Sábado -->
+                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+                                <div style="width: 120px; font-weight: 500;">Sábado</div>
+                                <div class="form-group stretch">
+                                    <select id="cfg-sab-tipo" class="matriz-tipo">
+                                        <option value="teoria">Teoria</option>
+                                        <option value="questoes">Questões</option>
+                                        <option value="manutencao" selected>Manutenção</option>
+                                        <option value="descanso">Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="cfg-sab-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                                </div>
+                            </div>
+
+                            <!-- Domingo -->
+                            <div class="form-row flex-between align-end">
+                                <div style="width: 120px; font-weight: 500;">Domingo</div>
+                                <div class="form-group stretch">
+                                    <select id="cfg-dom-tipo" class="matriz-tipo">
+                                        <option value="teoria">Teoria</option>
+                                        <option value="questoes">Questões</option>
+                                        <option value="manutencao">Manutenção</option>
+                                        <option value="descanso" selected>Descanso</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" id="cfg-dom-slots" class="matriz-slots" min="0" value="0" style="width: 100px;" disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Erros de Validação da Matriz aparecerão aqui -->
+                        <div id="alerta-matriz" class="hidden mb-2" style="background-color: #FEF2F2; color: var(--color-danger); padding: 12px; border-radius: var(--radius-md); font-size: 13px; border: 1px solid #FCA5A5;">
+                            <!-- Injetado via JS -->
+                        </div>
+
+                        <div class="form-actions mt-3 flex-between">
+                            <span style="font-size: 13px; color: var(--text-muted);">Passo 3: Arraste a ordem na aba "Meu Plano".</span>
+                            <button type="submit" id="btn-salvar-config" class="btn btn-primary" style="min-width: 200px;" disabled>
+                                <span class="material-symbols-outlined">check</span> Configurações Salvas
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- ====================================================================== -->
+    <!-- CAPÍTULO 5: MODAIS (JANELAS SOBREPOSTAS) -->
+    <!-- Janelas que aparecem por cima do conteúdo para ações focadas -->
+    <!-- ====================================================================== -->
+    
+    <!-- Modal Adicionar/Editar Matéria -->
+    <div id="modal-materia" class="modal-overlay hidden">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3 id="modal-materia-title">Adicionar Matéria</h3>
+                <button class="btn-close" id="btn-fechar-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </header>
+            
+            <div class="modal-body">
+                <form id="form-materia" onsubmit="event.preventDefault();">
+                    <div class="form-group mb-2">
+                        <label for="mat-nome">Nome da Matéria</label>
+                        <input type="text" id="mat-nome" placeholder="Ex: Direito Tributário I" required>
+                    </div>
+                    
+                    <div class="form-row mb-2">
+                        <div class="form-group stretch">
+                            <label for="mat-peso">Peso (Prioridade e Manutenção)</label>
+                            <input type="number" id="mat-peso" min="1" max="3" value="3" required title="Peso 3 = Revisão Semanal. Peso 1/2 = Revisão Quinzenal/Mensal.">
+                        </div>
+                    </div>
+
+                    <h4 class="form-subtitle">Metas do Edital (Fim de Fase)</h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group stretch">
+                            <label for="mat-sessoes">Sessões de Teoria Previstas</label>
+                            <input type="number" id="mat-sessoes" min="0" value="0" required>
+                        </div>
+                        <div class="form-group stretch">
+                            <label for="mat-questoes">Nº de Questões Previstas</label>
+                            <input type="number" id="mat-questoes" min="0" value="0" required>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-3">
+                        <button type="button" class="btn btn-secondary" id="btn-cancelar-modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar na Fila</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Registro Manual do Diário -->
+    <div id="modal-registro" class="modal-overlay hidden">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h3>Registro Manual</h3>
+                <button class="btn-close" id="btn-fechar-modal-registro">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </header>
+            
+            <div class="modal-body">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                    Use isto apenas para corrigir o histórico. O método ideal é apenas clicar em "Feito" no Cronograma.
+                </p>
+                <form id="form-registro" onsubmit="event.preventDefault();">
+                    <div class="form-row mb-2">
+                        <div class="form-group stretch">
+                            <label for="reg-data">Data</label>
+                            <input type="date" id="reg-data" required>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="form-group stretch">
+                            <label for="reg-materia">Matéria</label>
+                            <select id="reg-materia" required>
+                                <option value="" disabled selected>Selecione uma matéria...</option>
+                                <!-- Opções injetadas via JS -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="form-group stretch">
+                            <label for="reg-tipo">Tipo de Atividade</label>
+                            <select id="reg-tipo" required>
+                                <option value="" disabled selected>Selecione o que você fez...</option>
+                                <option value="sessoes">Sessões de Teoria Cumpridas</option>
+                                <option value="questoes">Questões Respondidas</option>
+                                <option value="manutencao">Sessões de Manutenção</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-quantidade">Quantidade</label>
+                            <input type="number" id="reg-quantidade" min="1" value="1" required>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="form-group stretch">
+                            <label for="reg-comentario">Comentário (Opcional)</label>
+                            <input type="text" id="reg-comentario" placeholder="Desempenho, tópicos, etc.">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer mt-3">
+                        <button type="button" class="btn btn-secondary" id="btn-cancelar-modal-registro">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Salvar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contêiner Flutuante para Notificações (Toasts) -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- ====================================================================== -->
+    <!-- CAPÍTULO 6: SCRIPTS -->
+    <!-- Carregamento do motor lógico da aplicação -->
+    <!-- ====================================================================== -->
+    <script src="script.js"></script>
+</body>
+</html>

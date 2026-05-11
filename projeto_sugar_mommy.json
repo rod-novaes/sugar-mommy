@@ -1,0 +1,107 @@
+{
+  "config": {
+    "dataInicio": "2026-05-11",
+    "dataFim": "2026-12-27",
+    "maxMaterias": 3,
+    "minutosSessao": 60,
+    "questoesSessao": 15,
+    "matrizSemanal": {
+      "seg": {
+        "tipo": "teoria",
+        "slots": 3
+      },
+      "ter": {
+        "tipo": "teoria",
+        "slots": 3
+      },
+      "qua": {
+        "tipo": "teoria",
+        "slots": 3
+      },
+      "qui": {
+        "tipo": "teoria",
+        "slots": 3
+      },
+      "sex": {
+        "tipo": "questoes",
+        "slots": 3
+      },
+      "sab": {
+        "tipo": "manutencao",
+        "slots": 3
+      },
+      "dom": {
+        "tipo": "descanso",
+        "slots": 0
+      }
+    }
+  },
+  "materias": [
+    {
+      "id": "1778539549771",
+      "nome": "Direito Tributário I",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600"
+    },
+    {
+      "id": "1778539558747",
+      "nome": "Contabilidade Geral",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600"
+    },
+    {
+      "id": "1778539572115",
+      "nome": "Auditoria",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600"
+    },
+    {
+      "id": "1778539583035",
+      "nome": "Direito Penal",
+      "peso": "1",
+      "sessoes": "30",
+      "questoes": "200"
+    },
+    {
+      "id": "1778539592145",
+      "nome": "Economia",
+      "peso": "2",
+      "sessoes": "45",
+      "questoes": "400"
+    },
+    {
+      "id": "1778539605532",
+      "nome": "Direito Financeiro",
+      "peso": "2",
+      "sessoes": "45",
+      "questoes": "400"
+    },
+    {
+      "id": "1778539618027",
+      "nome": "Direito Tributário II: Reforma Tributária",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600"
+    },
+    {
+      "id": "1778539733564",
+      "nome": "Tecnologia da Informação",
+      "peso": "3",
+      "sessoes": "90",
+      "questoes": "600"
+    }
+  ],
+  "registros": [
+    {
+      "id": "1778539681578",
+      "data": "2026-05-11",
+      "idMateria": "1778539592145",
+      "tipo": "sessoes",
+      "quantidade": "2",
+      "comentario": ""
+    }
+  ]
+}
