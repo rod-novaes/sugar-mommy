@@ -1,0 +1,281 @@
+/* ========================================================================== */
+/* CAPÍTULO 1: BARRAS DE ROLAGEM CUSTOMIZADAS                                 */
+/* ========================================================================== */
+::-webkit-scrollbar {
+    width: 14px; 
+    height: 14px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-app);
+    border-left: 1px solid var(--border-color);
+}
+::-webkit-scrollbar-thumb {
+    background-color: #94A3B8;
+    border-radius: 8px;
+    border: 3px solid var(--bg-app);
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-secondary);
+}
+
+/* ========================================================================== */
+/* CAPÍTULO 2: TRANSIÇÕES, ACESSIBILIDADE E ANIMAÇÕES                         */
+/* ========================================================================== */
+@keyframes fadeInView {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.view:not(.hidden) { animation: fadeInView 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+
+.modal-overlay:not(.hidden) { animation: fadeInModal 0.25s ease-out forwards; }
+@keyframes fadeInModal {
+    from { opacity: 0; backdrop-filter: blur(0px); }
+    to { opacity: 1; backdrop-filter: blur(2px); }
+}
+
+::selection { background-color: rgba(37, 99, 235, 0.2); color: var(--color-primary-hover); }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; border-radius: var(--radius-sm); }
+.btn:focus:not(:focus-visible) { outline: none; }
+
+/* Microinteração de Sucesso (Dopamina ao concluir sessão) */
+@keyframes pulse-success {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+    50% { transform: scale(0.98); background-color: #D1FAE5; border-color: #10B981; }
+    100% { transform: scale(1); box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); background-color: #F8FAFC; border-color: #CBD5E1; opacity: 0.6; }
+}
+.anim-success {
+    animation: pulse-success 0.5s ease-out forwards !important;
+    pointer-events: none;
+}
+
+/* ========================================================================== */
+/* CAPÍTULO 3: CLASSES UTILITÁRIAS E EMPTY STATES                             */
+/* ========================================================================== */
+.text-sm { font-size: 13px; }
+.text-muted { color: var(--text-muted); }
+.text-main { color: var(--text-main); }
+
+.mt-0 { margin-top: 0 !important; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.ml-2 { margin-left: 8px; }
+.p-4 { padding: 24px; }
+
+.align-center { align-items: center; }
+.icon-sm { font-size: 18px !important; }
+.btn-min-w { min-width: 200px; }
+
+/* Botões Extras */
+.btn-danger { background-color: var(--color-danger); color: #FFF; }
+.btn-danger:hover { background-color: #B91C1C; }
+
+/* Empty States Amigáveis */
+.empty-state-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 32px 16px;
+    background-color: #F8FAFC;
+    border: 1px dashed #CBD5E1;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+.empty-state-container:hover { background-color: #F1F5F9; border-color: #94A3B8; }
+.empty-icon { font-size: 48px; color: #94A3B8; opacity: 0.5; }
+
+/* ========================================================================== */
+/* CAPÍTULO 4: UI MODERNA DE TABELAS (CORES E RESPONSIVIDADE)                 */
+/* ========================================================================== */
+
+/* Dicas Visuais de Status na Fila (Meu Plano) */
+.row-active td { 
+    background-color: #F0F9FF !important; /* Azul muito claro (Em andamento) */
+}
+.row-waitlist td { 
+    background-color: #F8FAFC !important; /* Cinza claro (Espera) */
+    color: #64748B;
+}
+.row-completed td { 
+    background-color: #F0FDF4 !important; /* Verde muito claro (Concluída) */
+    opacity: 0.9;
+}
+
+/* --- Tabelas Responsivas (Padrão de Cards para Mobile) --- */
+@media (max-width: 768px) {
+    .table-container table, 
+    .table-container thead, 
+    .table-container tbody, 
+    .table-container th, 
+    .table-container td, 
+    .table-container tr { 
+        display: block; 
+    }
+    
+    /* Esconde o cabeçalho original de forma acessível */
+    .table-container thead tr { 
+        position: absolute; top: -9999px; left: -9999px; 
+    }
+    
+    /* Transforma a linha em um Card */
+    .table-container tr:not(.empty-state, .row-cut-off) { 
+        margin-bottom: 16px; 
+        border: 1px solid var(--border-color); 
+        border-radius: var(--radius-md); 
+        background: var(--bg-surface); 
+        padding: 8px 16px; 
+        box-shadow: var(--shadow-sm); 
+    }
+    
+    /* Configura as células com Data-Labels */
+    .table-container td:not(.drag-handle) { 
+        border: none; 
+        border-bottom: 1px solid #F1F5F9; 
+        position: relative; 
+        padding: 12px 0 12px 40%; 
+        text-align: right; 
+        min-height: 44px; 
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+    }
+    .table-container td:last-child { border-bottom: 0; }
+    
+    /* Injeta o rótulo da coluna via CSS */
+    .table-container td:not(.drag-handle)::before { 
+        content: attr(data-label); 
+        position: absolute; 
+        left: 0; 
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40%; 
+        white-space: nowrap; 
+        text-align: left; 
+        font-weight: 600; 
+        color: var(--text-muted); 
+        font-size: 11px; 
+        text-transform: uppercase; 
+    }
+
+    /* Ajustes específicos para o manipulador de arrasto no Mobile */
+    .table-container td.drag-handle {
+        text-align: center;
+        padding: 8px 0;
+        background: #F8FAFC;
+        border-radius: 4px;
+        margin-bottom: 8px;
+        border: 1px solid #E2E8F0;
+    }
+    .table-container tr.row-cut-off td {
+        padding: 16px 0;
+    }
+}
+
+/* ========================================================================== */
+/* CAPÍTULO 5: LAYOUT E COMPONENTES ESPECÍFICOS                               */
+/* ========================================================================== */
+
+/* Destaque Dashboard */
+.card-highlight { background-color: var(--color-primary); border: none; }
+.card-highlight h3, .card-highlight .label { color: #BFDBFE; }
+.card-highlight .metric { color: #FFFFFF; }
+
+/* Timeline do Cronograma (Visão da Semana) */
+.timeline-container { display: flex; flex-direction: column; gap: 0; background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+.timeline-item { display: flex; gap: 24px; position: relative; padding-bottom: 24px; }
+.timeline-item:last-child { padding-bottom: 0; }
+.timeline-date { width: 100px; flex-shrink: 0; text-align: right; }
+.timeline-date strong { display: block; font-size: 14px; color: var(--text-main); }
+.timeline-date small { color: var(--text-muted); font-size: 12px; }
+.timeline-marker { position: relative; display: flex; flex-direction: column; align-items: center; }
+.timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: #CBD5E1; border: 2px solid #fff; z-index: 2; box-shadow: 0 0 0 2px var(--bg-surface); }
+.timeline-item.is-today .timeline-dot { background: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
+.timeline-line { width: 2px; background: #E2E8F0; position: absolute; top: 12px; bottom: -24px; left: 5px; z-index: 1; }
+.timeline-item:last-child .timeline-line { display: none; }
+.timeline-content { flex: 1; padding-top: -2px; }
+.timeline-title { font-size: 13px; font-weight: 600; text-transform: capitalize; color: var(--text-muted); margin-bottom: 8px; display: block; }
+.timeline-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* Tags Consolidadas (Diário e Timeline) */
+.tag-atividade { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+.tag-teoria { background: var(--slot-teoria-bg); color: var(--slot-teoria-text); border: 1px solid var(--slot-teoria-border); }
+.tag-questoes { background: var(--slot-questoes-bg); color: var(--slot-questoes-text); border: 1px solid var(--slot-questoes-border); }
+.tag-manutencao { background: var(--slot-manutencao-bg); color: var(--slot-manutencao-text); border: 1px solid var(--slot-manutencao-border); }
+
+/* Badges de Peso (Meu Plano) */
+.badge-peso { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+.badge-high { background: #FEF2F2; color: #991B1B; }
+.badge-medium { background: #FFFBEB; color: #B45309; }
+.badge-low { background: #F1F5F9; color: #475569; }
+
+/* Divisores Elegantes (Meu Plano) */
+.row-cut-off td { background: transparent !important; border: none !important; padding: 32px 8px 16px 8px; }
+.cut-off-divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+.cut-off-divider::before, .cut-off-divider::after { content: ''; flex: 1; border-bottom: 1px dashed #CBD5E1; margin: 0 16px; }
+
+/* ========================================================================== */
+/* CAPÍTULO 6: ASSISTENTE DE CONFIGURAÇÃO (WIZARD)                            */
+/* ========================================================================== */
+.stepper { display: flex; align-items: center; justify-content: space-between; }
+.step { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); }
+.step.active { color: var(--color-primary); }
+.step-num { width: 28px; height: 28px; border-radius: 50%; background: #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+.step.active .step-num { background: var(--color-primary); color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
+.step-line { flex: 1; height: 2px; background: #E2E8F0; margin: 0 24px; }
+
+.slider-group { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
+.custom-slider { flex: 1; accent-color: var(--color-primary); cursor: pointer; }
+.slider-output { font-weight: 600; color: var(--color-primary); background: #EFF6FF; padding: 4px 12px; border-radius: 12px; font-size: 14px; min-width: 80px; text-align: center; }
+
+.day-card { border: 1px solid var(--border-color); border-left-width: 5px; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 12px; transition: all 0.3s ease; background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.day-header { font-weight: 600; font-size: 15px; width: 120px; flex-shrink: 0; }
+.day-controls { display: flex; gap: 24px; flex: 1; align-items: center; justify-content: space-between; }
+
+.segmented-control { display: flex; background: #F1F5F9; border-radius: 8px; padding: 4px; gap: 4px; flex: 1; max-width: 400px; }
+.segmented-control label { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+.segmented-control input { display: none; }
+.segmented-control label:has(input:checked) { background: #fff; color: var(--text-main); box-shadow: var(--shadow-sm); font-weight: 600; }
+
+.slots-input { display: flex; align-items: center; gap: 8px; }
+.slots-input label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+.slots-input input { width: 70px; text-align: center; font-weight: 600; }
+
+.day-card:has(input[value="teoria"]:checked) { border-left-color: var(--color-primary); background-color: #FAFCFF; }
+.day-card:has(input[value="questoes"]:checked) { border-left-color: var(--color-warning); background-color: #FFFCF5; }
+.day-card:has(input[value="manutencao"]:checked) { border-left-color: var(--color-success); background-color: #F6FDF9; }
+.day-card:has(input[value="descanso"]:checked) { border-left-color: var(--color-secondary); background-color: #F8FAFC; opacity: 0.8; }
+
+/* ========================================================================== */
+/* CAPÍTULO 7: RESPONSIVIDADE BASE DE ESTRUTURA                               */
+/* ========================================================================== */
+@media (max-width: 1024px) {
+    #main-content { padding: 24px; }
+    .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-card { grid-column: 1 / -1; }
+}
+
+@media (max-width: 768px) {
+    .brand h1 { display: none; }
+    #top-header { padding: 0 16px; }
+    .toolbar .btn-label { display: none; }
+    
+    #sidebar { width: 68px; transition: width 0.3s ease; }
+    .nav-item { padding: 16px; justify-content: center; }
+    .nav-item .nav-label { display: none; }
+    .nav-item.active { padding-left: 16px; border-left: 4px solid var(--color-primary); }
+    
+    #main-content { padding: 16px; }
+    .dashboard-grid, .slots-grid { grid-template-columns: 1fr; }
+    
+    .form-row { flex-direction: column; gap: 12px; }
+    .form-row.flex-between.align-end { align-items: flex-start; }
+    
+    .day-card { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .day-controls { flex-direction: column; width: 100%; align-items: stretch; gap: 16px; }
+    .segmented-control { max-width: 100%; }
+    
+    .step-line { margin: 0 8px; }
+    .step span:not(.step-num) { display: none; }
+}

@@ -19,6 +19,9 @@
 
     <!-- Estilos da Aplicação -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- Estilos de Polimento e UX -->
+    <link rel="stylesheet" href="frontend.css">
 </head>
 <body>
 
@@ -38,15 +41,15 @@
             <div class="toolbar">
                 <button class="btn btn-icon" id="btn-novo" title="Criar Novo Plano">
                     <span class="material-symbols-outlined">note_add</span>
-                    Novo
+                    <span class="btn-label">Novo</span>
                 </button>
                 <button class="btn btn-icon" id="btn-abrir" title="Abrir Plano (JSON)">
                     <span class="material-symbols-outlined">folder_open</span>
-                    Abrir
+                    <span class="btn-label">Abrir</span>
                 </button>
                 <button class="btn btn-primary btn-icon" id="btn-salvar" title="Salvar Backup (JSON)">
                     <span class="material-symbols-outlined">save</span>
-                    Salvar Rascunho
+                    <span class="btn-label">Salvar Rascunho</span>
                 </button>
             </div>
         </header>
@@ -62,23 +65,23 @@
                 <ul class="nav-menu">
                     <li class="nav-item active" data-target="view-dashboard">
                         <span class="material-symbols-outlined">dashboard</span>
-                        <span>Dashboard</span>
+                        <span class="nav-label">Dashboard</span>
                     </li>
                     <li class="nav-item" data-target="view-schedule">
                         <span class="material-symbols-outlined">calendar_month</span>
-                        <span>Cronograma</span>
+                        <span class="nav-label">Cronograma</span>
                     </li>
                     <li class="nav-item" data-target="view-plan">
                         <span class="material-symbols-outlined">format_list_numbered</span>
-                        <span>Meu Plano (Fila)</span>
+                        <span class="nav-label">Meu Plano (Fila)</span>
                     </li>
                     <li class="nav-item" data-target="view-diary">
                         <span class="material-symbols-outlined">edit_calendar</span>
-                        <span>Diário de Estudos</span>
+                        <span class="nav-label">Diário de Estudos</span>
                     </li>
                     <li class="nav-item" data-target="view-config">
                         <span class="material-symbols-outlined">settings</span>
-                        <span>Configurações</span>
+                        <span class="nav-label">Configurações</span>
                     </li>
                 </ul>
             </nav>
@@ -100,8 +103,8 @@
                     </header>
 
                     <div class="dashboard-grid">
-                        <!-- Cards de Resumo Rápido -->
-                        <div class="card summary-card">
+                        <!-- Linha 1: Cards de Resumo Rápido -->
+                        <div class="card summary-card card-highlight">
                             <h3>Progresso Geral</h3>
                             <div class="metric">0,00%</div>
                             <span class="label">da teoria executada</span>
@@ -109,7 +112,7 @@
                         <div class="card summary-card status-good">
                             <h3>Matérias Finalizadas</h3>
                             <div class="metric">0</div>
-                            <span class="label">no ciclo de manutenção</span>
+                            <span class="label">com metas batidas</span>
                         </div>
                         <div class="card summary-card">
                             <h3>Semanas Restantes</h3>
@@ -117,22 +120,34 @@
                             <span class="label">Semanas à frente</span>
                         </div>
 
-                        <!-- Espaços para os Gráficos -->
-                        <div class="card chart-card full-width">
-                            <h3>Últimos Dias Estudados</h3>
-                            <div class="chart-placeholder">Gráfico de Linha Aqui</div>
-                        </div>
-                        <div class="card chart-card">
-                            <h3>Sessões Feitas por Matéria</h3>
-                            <div class="chart-placeholder">Gráfico de Pizza Aqui</div>
-                        </div>
-                        <div class="card chart-card">
+                        <!-- Linha 2: Barras de Progresso (Simetria de 3) -->
+                        <div class="card mini-progress-card" id="card-prog-teoria">
                             <h3>Teoria: Planejado x Realizado</h3>
-                            <div class="chart-placeholder">Barra de Progresso Aqui</div>
+                            <div class="progress-wrapper"></div>
                         </div>
-                        <div class="card chart-card">
+                        <div class="card mini-progress-card" id="card-prog-questoes">
                             <h3>Questões: Planejadas x Respondidas</h3>
-                            <div class="chart-placeholder">Barra de Progresso Aqui</div>
+                            <div class="progress-wrapper"></div>
+                        </div>
+                        <div class="card mini-progress-card" id="card-prog-manutencao">
+                            <h3>Manutenção: Total Executado</h3>
+                            <div class="progress-wrapper"></div>
+                        </div>
+
+                        <!-- Linha 3: Últimos 7 Dias (Coluna Empilhada) -->
+                        <div class="card chart-card full-width">
+                            <h3>Esforço Diário (Últimos 7 Dias)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-7-dias"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Linha 4: Matérias (Barras Horizontais) -->
+                        <div class="card chart-card full-width">
+                            <h3>Sessões Feitas por Matéria</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-materias"></canvas>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -147,9 +162,6 @@
                             <h2>Cronograma de Estudos</h2>
                             <p class="subtitle">Sua fila inteligente. Apenas sente, cumpra o foco de hoje e marque como feito.</p>
                         </div>
-                        <button class="btn btn-secondary" id="btn-regerar-cronograma" title="Força o recálculo da fila">
-                            <span class="material-symbols-outlined">refresh</span> Atualizar Fila
-                        </button>
                     </header>
 
                     <!-- Foco de Hoje (Botões de Ação Grandes) -->
@@ -157,8 +169,9 @@
                         <h3 class="section-title" id="lbl-dia-hoje">Foco de Hoje</h3>
                         <div id="hoje-slots-container" class="slots-grid">
                             <!-- Os blocos do dia (Teoria, Questões ou Manutenção) serão injetados aqui -->
-                            <div class="empty-state card text-center full-width">
-                                Gere seu cronograma nas configurações para ver o seu dia.
+                            <div class="empty-state-container card text-center full-width">
+                                <span class="material-symbols-outlined empty-icon">event_busy</span>
+                                <p>Gere seu cronograma nas configurações para ver o seu dia.</p>
                             </div>
                         </div>
                     </div>
@@ -166,22 +179,12 @@
                     <!-- Visão da Semana (Previsibilidade) -->
                     <div class="schedule-week-section">
                         <h3 class="section-title">Previsão da Semana Atual</h3>
-                        <div class="card table-container">
-                            <table id="tabela-semana">
-                                <thead>
-                                    <tr>
-                                        <th>Dia da Semana</th>
-                                        <th>Tipo de Dia</th>
-                                        <th>Fila de Sessões Previstas</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Dias da semana injetados via JS -->
-                                    <tr class="empty-state">
-                                        <td colspan="3" class="text-center">Cronograma ainda não gerado.</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="timeline-container" id="timeline-semana">
+                            <!-- Injetado via JS -->
+                            <div class="empty-state-container text-center p-4">
+                                <span class="material-symbols-outlined empty-icon">calendar_today</span>
+                                <p>Cronograma ainda não gerado.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -205,18 +208,24 @@
                         <table id="tabela-materias">
                             <thead>
                                 <tr>
-                                    <th style="width: 40px;"></th> <!-- Coluna do Drag Handle -->
+                                    <th class="col-icon"></th>
                                     <th>Matéria</th>
-                                    <th>Peso</th>
+                                    <th>Prioridade</th>
                                     <th>Sessões de Teoria</th>
                                     <th>Nº de Questões</th>
+                                    <th>Progresso</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <!-- O Tbody usará drag and drop nativo ou interativo via JS -->
                             <tbody id="lista-materias-drag">
                                 <tr class="empty-state">
-                                    <td colspan="6" class="text-center">Nenhuma matéria cadastrada ainda. Clique em "Nova Matéria" para começar.</td>
+                                    <td colspan="7" class="text-center">
+                                        <div class="empty-state-container">
+                                            <span class="material-symbols-outlined empty-icon">inventory_2</span>
+                                            <p>Nenhuma matéria cadastrada ainda. Clique em "Nova Matéria" para começar.</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -244,19 +253,48 @@
                                 <tr>
                                     <th>Data</th>
                                     <th>Matéria</th>
-                                    <th>Sessões (Teoria)</th>
-                                    <th>Questões</th>
-                                    <th>Manutenção</th>
+                                    <th>Atividades Realizadas</th>
                                     <th>Comentário</th>
                                     <th class="text-center">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="empty-state">
-                                    <td colspan="7" class="text-center">Nenhum estudo registrado ainda.</td>
+                                    <td colspan="5" class="text-center">
+                                        <div class="empty-state-container">
+                                            <span class="material-symbols-outlined empty-icon">history</span>
+                                            <p>Nenhum estudo registrado ainda.</p>
+                                        </div>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
+
+                        <!-- Rodapé de Paginação -->
+                        <div id="diary-pagination" class="pagination-footer hidden">
+                            <div class="pagination-info">
+                                <select id="diary-page-size" class="select-page-size" onchange="changeDiaryPageSize(this.value)">
+                                    <option value="10">10 por pág.</option>
+                                    <option value="20" selected>20 por pág.</option>
+                                    <option value="50">50 por pág.</option>
+                                </select>
+                                <span id="diary-page-info" class="ml-2">Mostrando 0 a 0 de 0 registros</span>
+                            </div>
+                            <div class="pagination-controls">
+                                <button class="btn-page" id="btn-page-first" onclick="changeDiaryPage('first')" title="Primeira Página">
+                                    <span class="material-symbols-outlined icon-sm">keyboard_double_arrow_left</span>
+                                </button>
+                                <button class="btn-page" id="btn-page-prev" onclick="changeDiaryPage('prev')" title="Página Anterior">
+                                    <span class="material-symbols-outlined icon-sm">chevron_left</span>
+                                </button>
+                                <button class="btn-page" id="btn-page-next" onclick="changeDiaryPage('next')" title="Próxima Página">
+                                    <span class="material-symbols-outlined icon-sm">chevron_right</span>
+                                </button>
+                                <button class="btn-page" id="btn-page-last" onclick="changeDiaryPage('last')" title="Última Página">
+                                    <span class="material-symbols-outlined icon-sm">keyboard_double_arrow_right</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -270,11 +308,19 @@
                         <p class="subtitle">Defina as regras do jogo. A <strong>Sugar Mommy</strong> fará as contas por você.</p>
                     </header>
 
+                    <!-- Stepper Visual (Barra de Progresso) -->
+                    <div class="stepper mb-3">
+                        <div class="step active"><span class="step-num">1</span> Limites e Metas</div>
+                        <div class="step-line"></div>
+                        <div class="step active"><span class="step-num">2</span> Rotina Semanal</div>
+                        <div class="step-line"></div>
+                        <div class="step"><span class="step-num">3</span> Salvar</div>
+                    </div>
+
                     <form id="form-config" onsubmit="event.preventDefault();">
                         
                         <!-- Passo 1: Limites e Ritmo -->
                         <div class="card">
-                            <h3 class="form-section-title" style="margin-top: 0;">Passo 1: Ritmo e Limites</h3>
                             <div class="form-row">
                                 <div class="form-group stretch">
                                     <label for="cfg-data-inicio">Data de Início do Plano</label>
@@ -284,159 +330,163 @@
                                     <label for="cfg-data-fim">Data de Fim do Plano</label>
                                     <input type="date" id="cfg-data-fim" required>
                                 </div>
-                            </div>
-                            <div class="form-row">
                                 <div class="form-group stretch">
-                                    <label for="cfg-max-materias">Máximo de Matérias Simultâneas (Teoria):</label>
-                                    <input type="number" id="cfg-max-materias" min="1" max="3" value="3" required title="Recomendado: 2 ou 3 para não diluir o foco">
-                                    <small style="color: var(--text-muted); font-size: 12px;">Defina entre 1 e 3 matérias ao mesmo tempo.</small>
+                                    <label for="cfg-max-materias">Máximo de Matérias Ativas</label>
+                                    <input type="number" id="cfg-max-materias" min="1" max="3" value="3" required>
                                 </div>
                             </div>
-                            <div class="form-row">
+                            
+                            <div class="form-row mt-3 align-center">
                                 <div class="form-group stretch">
-                                    <label for="cfg-minutos-sessao">Uma sessão de Teoria/Manutenção equivale a (minutos):</label>
-                                    <input type="number" id="cfg-minutos-sessao" min="1" value="60" required>
+                                    <label for="cfg-minutos-sessao">Duração da Sessão (minutos)</label>
+                                    <div class="slider-group">
+                                        <input type="range" id="cfg-minutos-sessao" class="custom-slider" min="30" max="120" step="15" value="60" oninput="document.getElementById('out-minutos').innerText = this.value + ' min'">
+                                        <span id="out-minutos" class="slider-output">60 min</span>
+                                    </div>
                                 </div>
                                 <div class="form-group stretch">
-                                    <label for="cfg-questoes-sessao">Questões inéditas esperadas por sessão:</label>
-                                    <input type="number" id="cfg-questoes-sessao" min="1" value="15" required>
+                                    <label for="cfg-questoes-sessao">Questões por Sessão</label>
+                                    <div class="slider-group">
+                                        <input type="range" id="cfg-questoes-sessao" class="custom-slider" min="10" max="100" step="5" value="20" oninput="document.getElementById('out-questoes').innerText = this.value + ' q.'">
+                                        <span id="out-questoes" class="slider-output">15 q.</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Passo 2: A Matriz Semanal -->
-                        <div class="card">
-                            <h3 class="form-section-title" style="margin-top: 0;">Passo 2: Sua Matriz Semanal</h3>
-                            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 16px;">
-                                Distribua seus dias definindo o <strong>Tipo de Dia</strong> (Teoria, Questões, Manutenção, Descanso) e quantos <strong>Slots (Sessões)</strong> você fará. A ordem cronológica ideal é Teoria &rarr; Questões &rarr; Manutenção.
-                            </p>
-
+                        <!-- Passo 2: A Matriz Semanal (Cards Semânticos) -->
+                        <div class="card" id="matriz-semanal-container">
+                            <h3 class="form-section-title mt-0 mb-2">Sua Rotina Semanal</h3>
+                            
+                            <!-- Os 7 dias gerados estaticamente com Segmented Controls -->
                             <!-- Segunda -->
-                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <div style="width: 120px; font-weight: 500;">Segunda-feira</div>
-                                <div class="form-group stretch">
-                                    <label>Tipo de Dia</label>
-                                    <select id="cfg-seg-tipo" class="matriz-tipo">
-                                        <option value="teoria" selected>Teoria</option>
-                                        <option value="questoes">Questões</option>
-                                        <option value="manutencao">Manutenção</option>
-                                        <option value="descanso">Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Qtd. de Slots</label>
-                                    <input type="number" id="cfg-seg-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                            <div class="day-card">
+                                <div class="day-header">Segunda-feira</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-seg-tipo" value="teoria" checked> Teoria</label>
+                                        <label><input type="radio" name="cfg-seg-tipo" value="questoes"> Questões</label>
+                                        <label><input type="radio" name="cfg-seg-tipo" value="manutencao"> Revisão</label>
+                                        <label><input type="radio" name="cfg-seg-tipo" value="descanso"> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-seg-slots" min="0" value="3">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Terça -->
-                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <div style="width: 120px; font-weight: 500;">Terça-feira</div>
-                                <div class="form-group stretch">
-                                    <label class="hidden">Tipo de Dia</label> <!-- Oculto visualmente no desktop para alinhar, mantendo acessibilidade -->
-                                    <select id="cfg-ter-tipo" class="matriz-tipo">
-                                        <option value="teoria" selected>Teoria</option>
-                                        <option value="questoes">Questões</option>
-                                        <option value="manutencao">Manutenção</option>
-                                        <option value="descanso">Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label class="hidden">Qtd. de Slots</label>
-                                    <input type="number" id="cfg-ter-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                            <div class="day-card">
+                                <div class="day-header">Terça-feira</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-ter-tipo" value="teoria" checked> Teoria</label>
+                                        <label><input type="radio" name="cfg-ter-tipo" value="questoes"> Questões</label>
+                                        <label><input type="radio" name="cfg-ter-tipo" value="manutencao"> Revisão</label>
+                                        <label><input type="radio" name="cfg-ter-tipo" value="descanso"> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-ter-slots" min="0" value="3">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Quarta -->
-                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <div style="width: 120px; font-weight: 500;">Quarta-feira</div>
-                                <div class="form-group stretch">
-                                    <select id="cfg-qua-tipo" class="matriz-tipo">
-                                        <option value="teoria" selected>Teoria</option>
-                                        <option value="questoes">Questões</option>
-                                        <option value="manutencao">Manutenção</option>
-                                        <option value="descanso">Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" id="cfg-qua-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                            <div class="day-card">
+                                <div class="day-header">Quarta-feira</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-qua-tipo" value="teoria" checked> Teoria</label>
+                                        <label><input type="radio" name="cfg-qua-tipo" value="questoes"> Questões</label>
+                                        <label><input type="radio" name="cfg-qua-tipo" value="manutencao"> Revisão</label>
+                                        <label><input type="radio" name="cfg-qua-tipo" value="descanso"> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-qua-slots" min="0" value="3">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Quinta -->
-                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <div style="width: 120px; font-weight: 500;">Quinta-feira</div>
-                                <div class="form-group stretch">
-                                    <select id="cfg-qui-tipo" class="matriz-tipo">
-                                        <option value="teoria" selected>Teoria</option>
-                                        <option value="questoes">Questões</option>
-                                        <option value="manutencao">Manutenção</option>
-                                        <option value="descanso">Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" id="cfg-qui-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                            <div class="day-card">
+                                <div class="day-header">Quinta-feira</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-qui-tipo" value="teoria" checked> Teoria</label>
+                                        <label><input type="radio" name="cfg-qui-tipo" value="questoes"> Questões</label>
+                                        <label><input type="radio" name="cfg-qui-tipo" value="manutencao"> Revisão</label>
+                                        <label><input type="radio" name="cfg-qui-tipo" value="descanso"> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-qui-slots" min="0" value="3">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Sexta -->
-                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <div style="width: 120px; font-weight: 500;">Sexta-feira</div>
-                                <div class="form-group stretch">
-                                    <select id="cfg-sex-tipo" class="matriz-tipo">
-                                        <option value="teoria">Teoria</option>
-                                        <option value="questoes" selected>Questões</option>
-                                        <option value="manutencao">Manutenção</option>
-                                        <option value="descanso">Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" id="cfg-sex-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                            <div class="day-card">
+                                <div class="day-header">Sexta-feira</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-sex-tipo" value="teoria"> Teoria</label>
+                                        <label><input type="radio" name="cfg-sex-tipo" value="questoes" checked> Questões</label>
+                                        <label><input type="radio" name="cfg-sex-tipo" value="manutencao"> Revisão</label>
+                                        <label><input type="radio" name="cfg-sex-tipo" value="descanso"> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-sex-slots" min="0" value="3">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Sábado -->
-                            <div class="form-row flex-between align-end mb-2" style="border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
-                                <div style="width: 120px; font-weight: 500;">Sábado</div>
-                                <div class="form-group stretch">
-                                    <select id="cfg-sab-tipo" class="matriz-tipo">
-                                        <option value="teoria">Teoria</option>
-                                        <option value="questoes">Questões</option>
-                                        <option value="manutencao" selected>Manutenção</option>
-                                        <option value="descanso">Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" id="cfg-sab-slots" class="matriz-slots" min="0" value="3" style="width: 100px;">
+                            <div class="day-card">
+                                <div class="day-header">Sábado</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-sab-tipo" value="teoria"> Teoria</label>
+                                        <label><input type="radio" name="cfg-sab-tipo" value="questoes"> Questões</label>
+                                        <label><input type="radio" name="cfg-sab-tipo" value="manutencao" checked> Revisão</label>
+                                        <label><input type="radio" name="cfg-sab-tipo" value="descanso"> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-sab-slots" min="0" value="3">
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Domingo -->
-                            <div class="form-row flex-between align-end">
-                                <div style="width: 120px; font-weight: 500;">Domingo</div>
-                                <div class="form-group stretch">
-                                    <select id="cfg-dom-tipo" class="matriz-tipo">
-                                        <option value="teoria">Teoria</option>
-                                        <option value="questoes">Questões</option>
-                                        <option value="manutencao">Manutenção</option>
-                                        <option value="descanso" selected>Descanso</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <input type="number" id="cfg-dom-slots" class="matriz-slots" min="0" value="0" style="width: 100px;" disabled>
+                            <div class="day-card">
+                                <div class="day-header">Domingo</div>
+                                <div class="day-controls">
+                                    <div class="segmented-control">
+                                        <label><input type="radio" name="cfg-dom-tipo" value="teoria"> Teoria</label>
+                                        <label><input type="radio" name="cfg-dom-tipo" value="questoes"> Questões</label>
+                                        <label><input type="radio" name="cfg-dom-tipo" value="manutencao"> Revisão</label>
+                                        <label><input type="radio" name="cfg-dom-tipo" value="descanso" checked> Descanso</label>
+                                    </div>
+                                    <div class="slots-input">
+                                        <label>Sessões:</label>
+                                        <input type="number" id="cfg-dom-slots" min="0" value="0">
+                                    </div>
                                 </div>
                             </div>
+
                         </div>
 
-                        <!-- Erros de Validação da Matriz aparecerão aqui -->
-                        <div id="alerta-matriz" class="hidden mb-2" style="background-color: #FEF2F2; color: var(--color-danger); padding: 12px; border-radius: var(--radius-md); font-size: 13px; border: 1px solid #FCA5A5;">
-                            <!-- Injetado via JS -->
-                        </div>
+                        <!-- Área do Alerta -->
+                        <div id="alerta-matriz" class="alert-danger hidden mb-2"></div>
 
                         <div class="form-actions mt-3 flex-between">
-                            <span style="font-size: 13px; color: var(--text-muted);">Passo 3: Arraste a ordem na aba "Meu Plano".</span>
-                            <button type="submit" id="btn-salvar-config" class="btn btn-primary" style="min-width: 200px;" disabled>
-                                <span class="material-symbols-outlined">check</span> Configurações Salvas
+                            <span class="text-sm text-muted">Tudo pronto? Salve para recalcular a fila.</span>
+                            <button type="submit" id="btn-salvar-config" class="btn btn-primary btn-min-w">
+                                <span class="material-symbols-outlined">save</span> Salvar Alterações
                             </button>
                         </div>
                     </form>
@@ -456,7 +506,7 @@
         <div class="modal-content">
             <header class="modal-header">
                 <h3 id="modal-materia-title">Adicionar Matéria</h3>
-                <button class="btn-close" id="btn-fechar-modal">
+                <button class="btn-close modal-close-btn" data-target="modal-materia">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </header>
@@ -489,7 +539,7 @@
                     </div>
 
                     <div class="modal-footer mt-3">
-                        <button type="button" class="btn btn-secondary" id="btn-cancelar-modal">Cancelar</button>
+                        <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-materia">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Salvar na Fila</button>
                     </div>
                 </form>
@@ -501,14 +551,14 @@
     <div id="modal-registro" class="modal-overlay hidden">
         <div class="modal-content">
             <header class="modal-header">
-                <h3>Registro Manual</h3>
-                <button class="btn-close" id="btn-fechar-modal-registro">
+                <h3 id="modal-registro-title">Registro Manual</h3>
+                <button class="btn-close modal-close-btn" data-target="modal-registro">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </header>
             
             <div class="modal-body">
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+                <p class="text-sm text-muted mb-2">
                     Use isto apenas para corrigir o histórico. O método ideal é apenas clicar em "Feito" no Cronograma.
                 </p>
                 <form id="form-registro" onsubmit="event.preventDefault();">
@@ -550,10 +600,31 @@
                     </div>
 
                     <div class="modal-footer mt-3">
-                        <button type="button" class="btn btn-secondary" id="btn-cancelar-modal-registro">Cancelar</button>
+                        <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-registro">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Salvar Registro</button>
                     </div>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOVO: Modal de Confirmação Global (Ação Destrutiva) -->
+    <div id="modal-confirm" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 400px;">
+            <header class="modal-header">
+                <h3 id="modal-confirm-title">Confirmação</h3>
+                <button class="btn-close modal-close-btn" data-target="modal-confirm">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </header>
+            <div class="modal-body">
+                <p id="modal-confirm-message" class="text-main mb-3" style="font-size: 15px;">Tem certeza que deseja prosseguir com esta ação?</p>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-confirm" id="btn-cancelar-confirm">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btn-aceitar-confirm">
+                        <span class="material-symbols-outlined icon-sm">delete</span> Confirmar
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -565,6 +636,15 @@
     <!-- CAPÍTULO 6: SCRIPTS -->
     <!-- Carregamento do motor lógico da aplicação -->
     <!-- ====================================================================== -->
+    
+    <!-- Biblioteca SortableJS para arrastar e soltar fluido -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <!-- Biblioteca Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Script principal da aplicação -->
     <script src="script.js"></script>
+
 </body>
 </html>

@@ -313,13 +313,39 @@ tr:hover td { background-color: #F8FAFC; }
     padding: 32px;
 }
 
+/* Mini Barra de Progresso para Tabelas */
+.table-progress-container {
+    width: 100%;
+    min-width: 100px;
+}
+
+.table-progress-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.table-progress-bg {
+    width: 100%;
+    height: 6px;
+    background-color: #E2E8F0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.table-progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
 /* Drag and Drop Helpers (Tabela de Matérias) */
 .drag-handle {
     cursor: grab;
     color: #94A3B8;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    text-align: center; /* Substitui o flexbox para centralizar horizontalmente */
+    vertical-align: middle; /* Centraliza verticalmente na tabela */
     transition: color 0.2s;
 }
 
@@ -331,9 +357,14 @@ tr:hover td { background-color: #F8FAFC; }
     cursor: grabbing;
 }
 
-.tr-dragging {
-    opacity: 0.5;
-    background-color: var(--bg-sidebar-hover) !important;
+.sortable-ghost {
+    opacity: 0.4;
+    background-color: #E2E8F0 !important;
+}
+
+.sortable-drag {
+    box-shadow: var(--shadow-lg);
+    background-color: var(--bg-surface) !important;
 }
 
 /* Linha de corte visual na Fila */
@@ -364,6 +395,59 @@ tr:hover td { background-color: #F8FAFC; }
 .status-active { background-color: #DCFCE7; color: #166534; }
 .status-waiting { background-color: #F1F5F9; color: #475569; }
 
+/* Paginação de Tabelas */
+.pagination-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 4px;
+}
+
+.btn-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+    background-color: #F1F5F9;
+    color: var(--color-primary);
+    border-color: #CBD5E1;
+}
+
+.btn-page:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    background-color: #F8FAFC;
+}
+
+.select-page-size {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    outline: none;
+    color: var(--text-main);
+    background-color: var(--bg-surface);
+    cursor: pointer;
+}
 
 /* ========================================================================== */
 /* CAPÍTULO 5: ESTILOS ESPECÍFICOS DAS VIEWS */
@@ -426,6 +510,23 @@ tr:hover td { background-color: #F8FAFC; }
 .chart-card { min-height: 300px; }
 .chart-card h3 { font-size: 16px; margin-bottom: 16px; }
 
+.mini-progress-card {
+    min-height: 200px; /* Remove a altura de 300px herdada dos gráficos */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.mini-progress-card h3 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    color: var(--text-muted);
+}
+
+.progress-wrapper {
+    width: 100%;
+}
+
 .chart-placeholder {
     height: 220px;
     background-color: #F1F5F9;
@@ -437,10 +538,16 @@ tr:hover td { background-color: #F8FAFC; }
     color: var(--text-muted);
 }
 
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 300px; /* Altura base para os gráficos do Chart.js */
+}
+
 /* --- SEÇÃO 5.2: CRONOGRAMA E SLOTS --- */
 .slots-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 16px;
 }
 
