@@ -332,26 +332,19 @@
         max-height: calc(100vh - 32px);
         overflow-y: auto;
     }
-    
-    /* --- CORREÇÃO: Adiciona padding inferior para evitar sobreposição de botões --- */
+
     .modal-body {
-        /* Adiciona espaço para a nav bar (70px) + barra de ações (60px) + margem */
-        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
+        flex: 1 1 auto; /* Permite que o corpo cresça e encolha */
+        overflow-y: auto; /* Apenas o corpo do modal terá rolagem */
+        padding: 24px; /* Restaura o padding padrão */
     }
 
     .modal-footer {
-        /* Garante que o rodapé do modal fique "fixo" na parte de baixo dele */
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: var(--bg-surface);
-        padding: 16px 24px;
+        flex-shrink: 0; /* Impede que o rodapé encolha */
+        padding: 16px 24px; /* Adiciona o padding necessário */
+        /* Adiciona um padding na parte de baixo para o notch do iPhone */
         padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-        border-top: 1px solid var(--border-color);
-        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     }
-
 
     .toast-container {
         bottom: calc(env(safe-area-inset-bottom, 0px) + 80px); /* Acima da nav bar */
