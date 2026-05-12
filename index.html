@@ -234,10 +234,7 @@
                         </table>
                     </div>
                     
-                    <!-- NOVO: Floating Action Button para Mobile -->
-                    <button class="fab" id="fab-add-materia" title="Adicionar Nova Matéria">
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
+                    <!-- FAB MOVIMENTADO PARA O FIM DO ARQUIVO -->
                 </section>
 
                 <!-- ----------------------------------------------------------- -->
@@ -315,10 +312,7 @@
                         </div>
                     </div>
 
-                    <!-- NOVO: Floating Action Button para Mobile -->
-                    <button class="fab" id="fab-add-registro" title="Adicionar Registro Manual">
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
+                    <!-- FAB MOVIMENTADO PARA O FIM DO ARQUIVO -->
                 </section>
 
                 <!-- ----------------------------------------------------------- -->
@@ -533,159 +527,176 @@
 
                         <!-- Área do Alerta -->
                         <div id="alerta-matriz" class="alert-danger hidden mb-2"></div>
-
-                        <!-- ÁREA DE AÇÕES REMOVIDA DAQUI -->
                         
                     </form>
                     
-                    <!-- NOVO: Barra de Ação Fixa para Mobile -->
-                    <div class="bottom-action-bar">
-                        <button type="submit" id="btn-salvar-config" class="btn btn-primary btn-min-w" form="form-config">
-                            <span class="material-symbols-outlined">save</span> Salvar Alterações
-                        </button>
-                    </div>
+                    <!-- BARRA DE AÇÃO MOVIMENTADA PARA O FIM DO ARQUIVO -->
 
                 </section>
 
             </main>
         </div>
-    </div>
 
-    <!-- ====================================================================== -->
-    <!-- CAPÍTULO 5: MODAIS (JANELAS SOBREPOSTAS) -->
-    <!-- Janelas que aparecem por cima do conteúdo para ações focadas -->
-    <!-- ====================================================================== -->
-    
-    <!-- Modal Adicionar/Editar Matéria -->
-    <div id="modal-materia" class="modal-overlay hidden">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3 id="modal-materia-title">Adicionar Matéria</h3>
-                <button class="btn-close modal-close-btn" data-target="modal-materia">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </header>
-            
-            <div class="modal-body">
-                <form id="form-materia" onsubmit="event.preventDefault();">
-                    <div class="form-group mb-2">
-                        <label for="mat-nome">Nome da Matéria</label>
-                        <input type="text" id="mat-nome" placeholder="Ex: Direito Tributário I" required>
-                    </div>
-                    
-                    <div class="form-row mb-2">
-                        <div class="form-group stretch">
-                            <label for="mat-peso">Peso (Prioridade e Manutenção)</label>
-                            <input type="number" id="mat-peso" min="1" max="3" value="3" required title="Peso 3 = Revisão Semanal. Peso 1/2 = Revisão Quinzenal/Mensal.">
-                        </div>
-                    </div>
-
-                    <h4 class="form-subtitle">Metas do Edital (Fim de Fase)</h4>
-                    
-                    <div class="form-row">
-                        <div class="form-group stretch">
-                            <label for="mat-sessoes">Sessões de Teoria Previstas</label>
-                            <input type="number" id="mat-sessoes" min="0" value="0" required>
-                        </div>
-                        <div class="form-group stretch">
-                            <label for="mat-questoes">Nº de Questões Previstas</label>
-                            <input type="number" id="mat-questoes" min="0" value="0" required>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer mt-3">
-                        <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-materia">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar na Fila</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Registro Manual do Diário -->
-    <div id="modal-registro" class="modal-overlay hidden">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h3 id="modal-registro-title">Registro Manual</h3>
-                <button class="btn-close modal-close-btn" data-target="modal-registro">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </header>
-            
-            <div class="modal-body">
-                <p class="text-sm text-muted mb-2">
-                    Use isto apenas para corrigir o histórico. O método ideal é apenas clicar em "Feito" no Cronograma.
-                </p>
-                <form id="form-registro" onsubmit="event.preventDefault();">
-                    <div class="form-row mb-2">
-                        <div class="form-group stretch">
-                            <label for="reg-data">Data</label>
-                            <input type="date" id="reg-data" required>
-                        </div>
-                    </div>
-                    <div class="form-row mb-2">
-                        <div class="form-group stretch">
-                            <label for="reg-materia">Matéria</label>
-                            <select id="reg-materia" required>
-                                <option value="" disabled selected>Selecione uma matéria...</option>
-                                <!-- Opções injetadas via JS -->
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-row mb-2">
-                        <div class="form-group stretch">
-                            <label for="reg-tipo">Tipo de Atividade</label>
-                            <select id="reg-tipo" required>
-                                <option value="" disabled selected>Selecione o que você fez...</option>
-                                <option value="sessoes">Sessões de Teoria Cumpridas</option>
-                                <option value="questoes">Questões Respondidas</option>
-                                <option value="manutencao">Sessões de Manutenção</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-quantidade">Quantidade</label>
-                            <input type="number" id="reg-quantidade" min="1" value="1" required>
-                        </div>
-                    </div>
-                    <div class="form-row mb-2">
-                        <div class="form-group stretch">
-                            <label for="reg-comentario">Comentário (Opcional)</label>
-                            <input type="text" id="reg-comentario" placeholder="Desempenho, tópicos, etc.">
-                        </div>
-                    </div>
-
-                    <div class="modal-footer mt-3">
-                        <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-registro">Cancelar</button>
-                        <button type="submit" class="btn btn-primary">Salvar Registro</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- NOVO: Modal de Confirmação Global (Ação Destrutiva) -->
-    <div id="modal-confirm" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 400px;">
-            <header class="modal-header">
-                <h3 id="modal-confirm-title">Confirmação</h3>
-                <button class="btn-close modal-close-btn" data-target="modal-confirm">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </header>
-            <div class="modal-body">
-                <p id="modal-confirm-message" class="text-main mb-3" style="font-size: 15px;">Tem certeza que deseja prosseguir com esta ação?</p>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-confirm" id="btn-cancelar-confirm">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="btn-aceitar-confirm">
-                        <span class="material-symbols-outlined icon-sm">delete</span> Confirmar
+        <!-- ====================================================================== -->
+        <!-- CAPÍTULO 5: MODAIS (JANELAS SOBREPOSTAS) -->
+        <!-- Janelas que aparecem por cima do conteúdo para ações focadas -->
+        <!-- ====================================================================== -->
+        
+        <!-- Modal Adicionar/Editar Matéria -->
+        <div id="modal-materia" class="modal-overlay hidden">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h3 id="modal-materia-title">Adicionar Matéria</h3>
+                    <button class="btn-close modal-close-btn" data-target="modal-materia">
+                        <span class="material-symbols-outlined">close</span>
                     </button>
+                </header>
+                
+                <div class="modal-body">
+                    <form id="form-materia" onsubmit="event.preventDefault();">
+                        <div class="form-group mb-2">
+                            <label for="mat-nome">Nome da Matéria</label>
+                            <input type="text" id="mat-nome" placeholder="Ex: Direito Tributário I" required>
+                        </div>
+                        
+                        <div class="form-row mb-2">
+                            <div class="form-group stretch">
+                                <label for="mat-peso">Peso (Prioridade e Manutenção)</label>
+                                <input type="number" id="mat-peso" min="1" max="3" value="3" required title="Peso 3 = Revisão Semanal. Peso 1/2 = Revisão Quinzenal/Mensal.">
+                            </div>
+                        </div>
+
+                        <h4 class="form-subtitle">Metas do Edital (Fim de Fase)</h4>
+                        
+                        <div class="form-row">
+                            <div class="form-group stretch">
+                                <label for="mat-sessoes">Sessões de Teoria Previstas</label>
+                                <input type="number" id="mat-sessoes" min="0" value="0" required>
+                            </div>
+                            <div class="form-group stretch">
+                                <label for="mat-questoes">Nº de Questões Previstas</label>
+                                <input type="number" id="mat-questoes" min="0" value="0" required>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer mt-3">
+                            <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-materia">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar na Fila</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Contêiner Flutuante para Notificações (Toasts) -->
-    <div id="toast-container" class="toast-container"></div>
+        <!-- Modal Registro Manual do Diário -->
+        <div id="modal-registro" class="modal-overlay hidden">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <h3 id="modal-registro-title">Registro Manual</h3>
+                    <button class="btn-close modal-close-btn" data-target="modal-registro">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </header>
+                
+                <div class="modal-body">
+                    <p class="text-sm text-muted mb-2">
+                        Use isto apenas para corrigir o histórico. O método ideal é apenas clicar em "Feito" no Cronograma.
+                    </p>
+                    <form id="form-registro" onsubmit="event.preventDefault();">
+                        <div class="form-row mb-2">
+                            <div class="form-group stretch">
+                                <label for="reg-data">Data</label>
+                                <input type="date" id="reg-data" required>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="form-group stretch">
+                                <label for="reg-materia">Matéria</label>
+                                <select id="reg-materia" required>
+                                    <option value="" disabled selected>Selecione uma matéria...</option>
+                                    <!-- Opções injetadas via JS -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="form-group stretch">
+                                <label for="reg-tipo">Tipo de Atividade</label>
+                                <select id="reg-tipo" required>
+                                    <option value="" disabled selected>Selecione o que você fez...</option>
+                                    <option value="sessoes">Sessões de Teoria Cumpridas</option>
+                                    <option value="questoes">Questões Respondidas</option>
+                                    <option value="manutencao">Sessões de Manutenção</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="reg-quantidade">Quantidade</label>
+                                <input type="number" id="reg-quantidade" min="1" value="1" required>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="form-group stretch">
+                                <label for="reg-comentario">Comentário (Opcional)</label>
+                                <input type="text" id="reg-comentario" placeholder="Desempenho, tópicos, etc.">
+                            </div>
+                        </div>
+
+                        <div class="modal-footer mt-3">
+                            <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-registro">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">Salvar Registro</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação Global (Ação Destrutiva) -->
+        <div id="modal-confirm" class="modal-overlay hidden">
+            <div class="modal-content" style="max-width: 400px;">
+                <header class="modal-header">
+                    <h3 id="modal-confirm-title">Confirmação</h3>
+                    <button class="btn-close modal-close-btn" data-target="modal-confirm">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </header>
+                <div class="modal-body">
+                    <p id="modal-confirm-message" class="text-main mb-3" style="font-size: 15px;">Tem certeza que deseja prosseguir com esta ação?</p>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary modal-cancel-btn" data-target="modal-confirm" id="btn-cancelar-confirm">Cancelar</button>
+                        <button type="button" class="btn btn-danger" id="btn-aceitar-confirm">
+                            <span class="material-symbols-outlined icon-sm">delete</span> Confirmar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contêiner Flutuante para Notificações (Toasts) -->
+        <div id="toast-container" class="toast-container"></div>
+        
+        <!-- ====================================================================== -->
+        <!-- CAPÍTULO 5.1: COMPONENTES DE AÇÃO MOBILE (MOVIMENTADOS) -->
+        <!-- Estes componentes foram movidos para fora do #app-body para que o -->
+        <!-- posicionamento 'fixed' funcione corretamente em relação à viewport. -->
+        <!-- ====================================================================== -->
+        
+        <!-- FAB para adicionar matéria em "Meu Plano" -->
+        <button class="fab hidden" id="fab-add-materia" title="Adicionar Nova Matéria">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+
+        <!-- FAB para adicionar registro em "Diário" -->
+        <button class="fab hidden" id="fab-add-registro" title="Adicionar Registro Manual">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+
+        <!-- Barra de Ação Fixa para salvar "Configurações" -->
+        <div class="bottom-action-bar hidden">
+            <button type="submit" id="btn-salvar-config" class="btn btn-primary btn-min-w" form="form-config">
+                <span class="material-symbols-outlined">save</span> Salvar Alterações
+            </button>
+        </div>
+
+    </div> <!-- FIM de #app-container -->
 
     <!-- ====================================================================== -->
     <!-- CAPÍTULO 6: SCRIPTS -->

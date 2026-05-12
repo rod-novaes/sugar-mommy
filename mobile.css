@@ -25,6 +25,12 @@
         overflow-x: hidden;
     }
 
+    /* --- CORREÇÃO: Reduz o espaço em branco no topo das views --- */
+    .view-header {
+        margin-bottom: 16px; /* Reduzido de 24px */
+    }
+
+
     /* ========================================================================== */
     /* CAPÍTULO 2: HEADER E BOTÕES DE AÇÃO                                        */
     /* Esconde botões de desktop para dar lugar aos FABs                          */
@@ -129,8 +135,9 @@
         box-shadow: var(--shadow-sm); 
         padding: 16px;
         padding-right: 48px; /* Espaço para a alça de arrastar */
-        display: grid; /* Usamos Grid para controle total do layout */
-        grid-template-columns: 1fr 1fr; /* Duas colunas para as métricas */
+        display: grid;
+        /* --- CORREÇÃO: Altera o grid para 3 colunas para as métricas --- */
+        grid-template-columns: repeat(3, 1fr);
         gap: 16px 12px;
     }
     
@@ -152,8 +159,11 @@
     /* Remove o label "::before", pois o layout agora é autoexplicativo */
     .table-container td::before { content: none; }
 
-    /* Layout dos Itens do Card */
+    /* --- CORREÇÃO: Ajusta o posicionamento dos itens no novo grid de 3 colunas --- */
     #tabela-materias td[data-label="Matéria"] { grid-column: 1 / -1; }
+    #tabela-materias td[data-label="Prioridade"] { grid-column: 1 / 2; text-align: center; }
+    #tabela-materias td[data-label="Teoria"] { grid-column: 2 / 3; text-align: center; }
+    #tabela-materias td[data-label="Questões"] { grid-column: 3 / 4; text-align: center; }
     #tabela-materias td[data-label="Progresso"] { grid-column: 1 / -1; }
     #tabela-materias td[data-label="Ações"] { grid-column: 1 / -1; margin-top: 8px; }
     
@@ -210,6 +220,10 @@
     /* --- SEÇÃO 4.4: PAGINAÇÃO MOBILE-FRIENDLY --- */
     .pagination-footer { flex-direction: column; gap: 16px; }
     .pagination-controls-desktop { display: none; }
+    
+    /* --- CORREÇÃO: Oculta o seletor de itens por página --- */
+    .pagination-info { display: none; }
+
     .pagination-controls-mobile {
         display: flex;
         justify-content: space-between;
@@ -261,16 +275,49 @@
     /* Ativa e posiciona os componentes que estavam escondidos no desktop         */
     /* ========================================================================== */
     .fab {
-        display: flex; /* Ativa o FAB */
+        display: none; /* Controlado via JS para aparecer na view correta */
+        position: fixed;
         bottom: calc(env(safe-area-inset-bottom, 0px) + 70px + 16px); /* Acima da nav bar */
         right: 16px;
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        background-color: var(--color-primary);
+        color: var(--text-inverse);
+        border: none;
+        box-shadow: var(--shadow-lg);
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        z-index: 1001;
+        transition: transform 0.2s ease-out, background-color 0.2s;
+    }
+    .fab:not(.hidden) {
+        display: flex; /* Garante que o botão apareça quando não estiver escondido */
     }
     
+    /* --- CORREÇÃO: Garante o posicionamento fixo da barra de ação --- */
     .bottom-action-bar {
-        display: flex; /* Ativa a Barra de Ação */
-        /* O padding já vem do CSS global, ajustando para a nav bar inferior */
+        display: none; /* Controlado via JS para aparecer na view correta */
+        position: fixed;
+        bottom: 70px; /* Alinhado com a parte de cima da nav bar */
+        left: 0;
+        right: 0;
+        padding: 16px;
         padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
-        bottom: 70px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(5px);
+        border-top: 1px solid var(--border-color);
+        box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+        z-index: 1001;
+        justify-content: center;
+    }
+    .bottom-action-bar:not(.hidden) {
+        display: flex; /* Garante que a barra apareça quando não estiver escondida */
+    }
+    .bottom-action-bar button {
+        width: 100%;
+        max-width: 400px;
     }
 
     /* ========================================================================== */
@@ -282,6 +329,26 @@
         max-height: calc(100vh - 32px);
         overflow-y: auto;
     }
+    
+    /* --- CORREÇÃO: Adiciona padding inferior para evitar sobreposição de botões --- */
+    .modal-body {
+        /* Adiciona espaço para a nav bar (70px) + barra de ações (60px) + margem */
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px);
+    }
+
+    .modal-footer {
+        /* Garante que o rodapé do modal fique "fixo" na parte de baixo dele */
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--bg-surface);
+        padding: 16px 24px;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        border-top: 1px solid var(--border-color);
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    }
+
 
     .toast-container {
         bottom: calc(env(safe-area-inset-bottom, 0px) + 80px); /* Acima da nav bar */

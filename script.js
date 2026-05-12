@@ -75,10 +75,13 @@ const formMateria = document.getElementById('form-materia');
 const modalRegistro = document.getElementById('modal-registro');
 const formRegistro = document.getElementById('form-registro');
 const modalConfirm = document.getElementById('modal-confirm');
-const fabAddMateria = document.getElementById('fab-add-materia'); // NOVO: FAB Matéria
-const fabAddRegistro = document.getElementById('fab-add-registro'); // NOVO: FAB Registro
 let editingMateriaId = null;
 let editingRegistroId = null;
+
+// Componentes de Ação Mobile
+const fabAddMateria = document.getElementById('fab-add-materia');
+const fabAddRegistro = document.getElementById('fab-add-registro');
+const bottomActionBar = document.querySelector('.bottom-action-bar');
 
 // Callback para o Modal de Confirmação Genérico
 let confirmActionCallback = null;
@@ -1055,6 +1058,27 @@ function switchView(targetViewId) {
     views.forEach(view => view.classList.add('hidden'));
     const targetView = document.getElementById(targetViewId);
     if (targetView) targetView.classList.remove('hidden');
+
+    // --- Lógica para controlar a visibilidade dos botões mobile ---
+    
+    // 1. Esconde todos os botões de ação mobile como padrão (reset)
+    if (fabAddMateria) fabAddMateria.classList.add('hidden');
+    if (fabAddRegistro) fabAddRegistro.classList.add('hidden');
+    if (bottomActionBar) bottomActionBar.classList.add('hidden');
+
+    // 2. Mostra o botão específico da view atual
+    switch (targetViewId) {
+        case 'view-plan':
+            if (fabAddMateria) fabAddMateria.classList.remove('hidden');
+            break;
+        case 'view-diary':
+            if (fabAddRegistro) fabAddRegistro.classList.remove('hidden');
+            break;
+        case 'view-config':
+            if (bottomActionBar) bottomActionBar.classList.remove('hidden');
+            break;
+    }
+
     renderAll();
 }
 
@@ -1128,6 +1152,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadData();
     renderAll();
+
+    // --- Ajusta a paginação do diário para mobile ---
+    if (window.innerWidth <= 768) {
+        diarioItemsPerPage = 7; // Define um limite menor para telas pequenas
+        renderDiary(); // Renderiza o diário novamente com a nova configuração
+    }
 
     // Inicialização da biblioteca SortableJS para "Meu Plano"
     if (typeof Sortable !== 'undefined') {
