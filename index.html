@@ -233,6 +233,11 @@
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- NOVO: Floating Action Button para Mobile -->
+                    <button class="fab" id="fab-add-materia" title="Adicionar Nova Matéria">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
                 </section>
 
                 <!-- ----------------------------------------------------------- -->
@@ -283,7 +288,9 @@
                                 </select>
                                 <span id="diary-page-info" class="ml-2">Mostrando 0 a 0 de 0 registros</span>
                             </div>
-                            <div class="pagination-controls">
+                            
+                            <!-- ATUALIZADO: Controles de paginação separados para Desktop e Mobile -->
+                            <div class="pagination-controls pagination-controls-desktop">
                                 <button class="btn-page" id="btn-page-first" onclick="changeDiaryPage('first')" title="Primeira Página">
                                     <span class="material-symbols-outlined icon-sm">keyboard_double_arrow_left</span>
                                 </button>
@@ -297,8 +304,21 @@
                                     <span class="material-symbols-outlined icon-sm">keyboard_double_arrow_right</span>
                                 </button>
                             </div>
+                            <div class="pagination-controls pagination-controls-mobile">
+                                <button class="btn btn-secondary" id="btn-page-prev-mobile" onclick="changeDiaryPage('prev')">
+                                    <span class="material-symbols-outlined">chevron_left</span> Anterior
+                                </button>
+                                <button class="btn btn-secondary" id="btn-page-next-mobile" onclick="changeDiaryPage('next')">
+                                    Próxima <span class="material-symbols-outlined">chevron_right</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- NOVO: Floating Action Button para Mobile -->
+                    <button class="fab" id="fab-add-registro" title="Adicionar Registro Manual">
+                        <span class="material-symbols-outlined">add</span>
+                    </button>
                 </section>
 
                 <!-- ----------------------------------------------------------- -->
@@ -361,7 +381,7 @@
                         <div class="card" id="matriz-semanal-container">
                             <h3 class="form-section-title mt-0 mb-2">Sua Rotina Semanal</h3>
                             
-                            <!-- Os 7 dias gerados estaticamente com Segmented Controls -->
+                            <!-- ATUALIZADO: Inputs de sessão com botões + e - -->
                             <!-- Segunda -->
                             <div class="day-card">
                                 <div class="day-header">Segunda-feira</div>
@@ -374,7 +394,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-seg-slots" min="0" value="3">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-seg-slots" min="0" value="3">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -391,7 +415,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-ter-slots" min="0" value="3">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-ter-slots" min="0" value="3">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -408,7 +436,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-qua-slots" min="0" value="3">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-qua-slots" min="0" value="3">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -425,7 +457,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-qui-slots" min="0" value="3">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-qui-slots" min="0" value="3">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -442,7 +478,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-sex-slots" min="0" value="3">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-sex-slots" min="0" value="3">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -459,7 +499,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-sab-slots" min="0" value="3">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-sab-slots" min="0" value="3">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -476,7 +520,11 @@
                                     </div>
                                     <div class="slots-input">
                                         <label>Sessões:</label>
-                                        <input type="number" id="cfg-dom-slots" min="0" value="0">
+                                        <div class="input-stepper">
+                                            <button type="button" class="btn-step" data-action="decrement" tabindex="-1">-</button>
+                                            <input type="number" id="cfg-dom-slots" min="0" value="0">
+                                            <button type="button" class="btn-step" data-action="increment" tabindex="-1">+</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -486,13 +534,17 @@
                         <!-- Área do Alerta -->
                         <div id="alerta-matriz" class="alert-danger hidden mb-2"></div>
 
-                        <div class="form-actions mt-3 flex-between">
-                            <span class="text-sm text-muted">Tudo pronto? Salve para recalcular a fila.</span>
-                            <button type="submit" id="btn-salvar-config" class="btn btn-primary btn-min-w">
-                                <span class="material-symbols-outlined">save</span> Salvar Alterações
-                            </button>
-                        </div>
+                        <!-- ÁREA DE AÇÕES REMOVIDA DAQUI -->
+                        
                     </form>
+                    
+                    <!-- NOVO: Barra de Ação Fixa para Mobile -->
+                    <div class="bottom-action-bar">
+                        <button type="submit" id="btn-salvar-config" class="btn btn-primary btn-min-w" form="form-config">
+                            <span class="material-symbols-outlined">save</span> Salvar Alterações
+                        </button>
+                    </div>
+
                 </section>
 
             </main>

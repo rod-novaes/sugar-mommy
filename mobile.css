@@ -7,7 +7,7 @@
 
     /* ========================================================================== */
     /* CAPÍTULO 1: FUNDAMENTOS E LAYOUT MESTRE                                    */
-    /* Previne rolagem lateral (overflow) e ajusta a estrutura base               */
+    /* Previne rolagem lateral e ajusta o padding para a navegação fixa           */
     /* ========================================================================== */
     body {
         overflow-x: hidden;
@@ -19,14 +19,15 @@
         flex-direction: column;
     }
 
-    /* O conteúdo principal ganha espaço extra no fundo para não ser coberto pela Navigation Bar */
+    /* O conteúdo principal ganha espaço extra no fundo para não ser coberto pela Navigation Bar e pelo FAB */
     #main-content {
-        padding: 16px 16px 90px 16px !important;
+        padding: 16px 16px 160px 16px !important; /* Aumentado para dar espaço ao FAB e à barra de ações */
         overflow-x: hidden;
     }
 
     /* ========================================================================== */
-    /* CAPÍTULO 2: HEADER E TOUCH TARGETS (ALVOS DE TOQUE)                        */
+    /* CAPÍTULO 2: HEADER E BOTÕES DE AÇÃO                                        */
+    /* Esconde botões de desktop para dar lugar aos FABs                          */
     /* ========================================================================== */
     #top-header {
         padding: 0 16px;
@@ -45,13 +46,18 @@
         display: none; /* Botões apenas com ícones no topo */
     }
 
-    /* Aumenta a área de toque dos botões do topo */
     .toolbar .btn-icon {
         padding: 10px;
     }
 
+    /* Esconde os botões de "Adicionar" do cabeçalho, pois usaremos o FAB */
+    #view-plan .view-header #btn-add-materia,
+    #view-diary .view-header #btn-add-registro {
+        display: none;
+    }
+
     /* ========================================================================== */
-    /* CAPÍTULO 3: REVOLUÇÃO - BOTTOM NAVIGATION BAR                              */
+    /* CAPÍTULO 3: BOTTOM NAVIGATION BAR                                          */
     /* Transforma a Sidebar Lateral em uma Barra de Abas Inferior (App Style)     */
     /* ========================================================================== */
     #sidebar {
@@ -68,48 +74,34 @@
     }
 
     .nav-menu {
-        display: flex;
-        flex-direction: row;
-        width: 100%;
-        padding: 0;
-        justify-content: space-around;
-        align-items: center;
+        display: flex; flex-direction: row; width: 100%; padding: 0;
+        justify-content: space-around; align-items: center;
     }
 
     .nav-item {
-        flex: 1;
-        flex-direction: column; /* Ícone em cima, texto embaixo */
-        padding: 8px 4px;
-        gap: 4px;
-        border-left: none !important;
-        border-top: 3px solid transparent;
-        justify-content: center;
-        border-radius: 0;
+        flex: 1; flex-direction: column; padding: 8px 4px; gap: 4px;
+        border-left: none !important; border-top: 3px solid transparent;
+        justify-content: center; border-radius: 0;
     }
 
-    /* Exibe os rótulos bem pequenos, padrão iOS/Android */
     .nav-item .nav-label {
-        display: block !important;
-        font-size: 10px;
-        font-weight: 500;
-        text-align: center;
-        white-space: nowrap;
+        display: block !important; font-size: 10px; font-weight: 500;
+        text-align: center; white-space: nowrap;
     }
 
-    .nav-item .material-symbols-outlined {
-        font-size: 24px;
-    }
+    .nav-item .material-symbols-outlined { font-size: 24px; }
 
     .nav-item.active {
-        background-color: transparent;
-        border-top: 3px solid var(--color-primary);
-        padding-left: 4px !important;
-        color: var(--color-primary);
+        background-color: transparent; border-top: 3px solid var(--color-primary);
+        padding-left: 4px !important; color: var(--color-primary);
     }
 
     /* ========================================================================== */
-    /* CAPÍTULO 4: TABELAS EM CARDS (MEU PLANO E DIÁRIO)                          */
+    /* CAPÍTULO 4: REVOLUÇÃO DOS CARDS (MEU PLANO E DIÁRIO)                       */
+    /* Transforma tabelas em cards com hierarquia visual clara e ergonômica     */
     /* ========================================================================== */
+    
+    /* --- SEÇÃO 4.1: RESET DA TABELA --- */
     .table-container { background: transparent; border: none; box-shadow: none; }
     
     .table-container table, 
@@ -126,75 +118,115 @@
         position: absolute; top: -9999px; left: -9999px; 
     }
     
-    .table-container tr:not(.empty-state, .row-cut-off) { 
+    /* --- SEÇÃO 4.2: O NOVO CARD DE "MEU PLANO" --- */
+    #tabela-materias tr:not(.empty-state, .row-cut-off) {
+        position: relative; /* Contexto para a alça de arrastar */
         margin-bottom: 16px; 
-        border: 1px solid var(--border-color); 
+        border: 1px solid var(--border-color);
+        border-left-width: 4px; /* Destaque de status */
         border-radius: var(--radius-md); 
         background: var(--bg-surface); 
         box-shadow: var(--shadow-sm); 
-        padding: 4px; /* Card com respiro */
+        padding: 16px;
+        padding-right: 48px; /* Espaço para a alça de arrastar */
+        display: grid; /* Usamos Grid para controle total do layout */
+        grid-template-columns: 1fr 1fr; /* Duas colunas para as métricas */
+        gap: 16px 12px;
     }
     
-    /* Layout Empilhado (Rótulo em cima, valor embaixo) para o conteúdo respirar */
-    .table-container td:not(.drag-handle) { 
-        border: none; 
-        border-bottom: 1px solid #F1F5F9; 
-        padding: 12px 16px; 
-        text-align: left; 
+    /* Regras de cor de status usando a borda esquerda */
+    #tabela-materias tr.row-active { border-left-color: var(--color-primary); }
+    #tabela-materias tr.row-waitlist { border-left-color: var(--color-secondary); opacity: 0.9; }
+    #tabela-materias tr.row-completed { border-left-color: var(--color-success); }
+    
+    /* Reset das células da tabela */
+    .table-container td { 
+        border: none !important; 
+        padding: 0 !important;
         display: flex;
         flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
+        gap: 4px;
+        background: transparent !important; /* Garante que as cores de status não sejam sobrescritas */
     }
     
-    .table-container td:last-child { border-bottom: 0; }
+    /* Remove o label "::before", pois o layout agora é autoexplicativo */
+    .table-container td::before { content: none; }
+
+    /* Layout dos Itens do Card */
+    #tabela-materias td[data-label="Matéria"] { grid-column: 1 / -1; }
+    #tabela-materias td[data-label="Progresso"] { grid-column: 1 / -1; }
+    #tabela-materias td[data-label="Ações"] { grid-column: 1 / -1; margin-top: 8px; }
     
-    .table-container td:not(.drag-handle)::before { 
-        content: attr(data-label); 
-        font-weight: 600; 
-        color: var(--text-muted); 
-        font-size: 11px; 
-        text-transform: uppercase; 
-        display: block;
-    }
+    /* Estilo dos Títulos e Labels */
+    .card-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+    #tabela-materias td[data-label="Matéria"] strong { font-size: 16px; }
 
-    /* Centraliza e emparelha os botões de ação */
-    .table-container td[data-label="Ações"] {
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        background-color: #F8FAFC;
-        border-radius: 0 0 var(--radius-md) var(--radius-md);
-        margin: -4px; /* Compensa o padding do card pai */
-        margin-top: 4px;
-        padding: 12px;
-    }
-
-    .table-container td.drag-handle {
-        text-align: center;
-        padding: 12px;
+    /* Alça de Arraste Ergonômica */
+    #tabela-materias .drag-handle {
+        position: absolute; top: 0; right: 0; bottom: 0;
+        width: 40px;
+        display: flex; align-items: center; justify-content: center;
+        border-left: 1px solid var(--border-color);
         background: #F8FAFC;
-        border-radius: 4px 4px 0 0;
-        border-bottom: 1px solid var(--border-color);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
         color: #94A3B8;
     }
+    
+    /* Ações no rodapé do card */
+    #tabela-materias td[data-label="Ações"] {
+        flex-direction: row; justify-content: flex-end; gap: 8px;
+        padding-top: 16px !important; border-top: 1px solid #F1F5F9 !important;
+    }
+    
+    /* --- SEÇÃO 4.3: O NOVO CARD DE "DIÁRIO" --- */
+    #tabela-historico tr:not(.empty-state) {
+        margin-bottom: 16px; border: 1px solid var(--border-color);
+        border-radius: var(--radius-md); background: var(--bg-surface);
+        box-shadow: var(--shadow-sm); padding: 16px;
+        display: flex; flex-direction: column; gap: 12px;
+    }
 
+    #tabela-historico td { border-bottom: none !important; }
+
+    /* Cabeçalho do Card (Data + Matéria) */
+    .diary-card-header { display: flex; justify-content: space-between; align-items: center; }
+    #tabela-historico td[data-label="Data"] { font-weight: 600; color: var(--color-primary); }
+    #tabela-historico td[data-label="Matéria"] strong { font-size: 15px; text-align: right; }
+    
+    /* Corpo do Card */
+    #tabela-historico td[data-label="Atividades"] { flex-wrap: wrap; flex-direction: row; gap: 6px; }
+    #tabela-historico td[data-label="Comentário"] { font-size: 13px; font-style: italic; color: var(--text-muted); padding: 12px !important; background: #F8FAFC !important; border-radius: var(--radius-sm); }
+    
+    /* Rodapé com Ações */
+    #tabela-historico td[data-label="Ações"] {
+        flex-direction: row; justify-content: flex-end; gap: 8px; align-items: center;
+        padding-top: 12px !important; border-top: 1px solid #F1F5F9 !important; margin-top: 4px;
+    }
+    
     /* Divisores de status */
     .row-cut-off td { padding: 24px 0 16px 0 !important; background: transparent !important; }
     .cut-off-divider { font-size: 10px; }
 
+    /* --- SEÇÃO 4.4: PAGINAÇÃO MOBILE-FRIENDLY --- */
+    .pagination-footer { flex-direction: column; gap: 16px; }
+    .pagination-controls-desktop { display: none; }
+    .pagination-controls-mobile {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 12px;
+    }
+    .pagination-controls-mobile .btn {
+        flex: 1;
+        padding: 12px; /* Maior área de toque */
+    }
+
     /* ========================================================================== */
     /* CAPÍTULO 5: DASHBOARD E GRÁFICOS                                           */
     /* ========================================================================== */
-    .dashboard-grid { 
-        grid-template-columns: 1fr; 
-        gap: 16px;
-    }
-
+    .dashboard-grid { grid-template-columns: 1fr; gap: 16px; }
     .summary-card { padding: 16px; }
     .summary-card .metric { font-size: 32px; }
-
-    /* Previne estouro horizontal nos gráficos */
     .chart-card { min-height: auto; width: 100%; overflow: hidden; padding: 16px;}
     .chart-wrapper { width: 100%; min-width: 0; overflow-x: auto; }
     
@@ -202,34 +234,10 @@
     /* CAPÍTULO 6: CRONOGRAMA E TIMELINE                                          */
     /* ========================================================================== */
     .slots-grid { grid-template-columns: 1fr; }
-    
-    /* Reestrutura a Timeline para o Data não empurrar o conteúdo pra fora */
-    .timeline-item { 
-        flex-direction: column; 
-        gap: 8px; 
-        padding-left: 28px; /* Espaço para a linha e bolinha */
-        padding-bottom: 32px;
-    }
-    
-    .timeline-date { 
-        width: auto; 
-        text-align: left; 
-    }
-    
-    .timeline-marker { 
-        position: absolute; 
-        left: 0; 
-        top: 0; 
-        bottom: 0; 
-        align-items: flex-start;
-    }
-    
-    .timeline-line { 
-        left: 5px; /* Alinha a linha sob a bolinha */
-        top: 16px;
-        bottom: -32px;
-    }
-    
+    .timeline-item { flex-direction: column; gap: 8px; padding-left: 28px; padding-bottom: 32px; }
+    .timeline-date { width: auto; text-align: left; }
+    .timeline-marker { position: absolute; left: 0; top: 0; bottom: 0; align-items: flex-start; }
+    .timeline-line { left: 5px; top: 16px; bottom: -32px; }
     .timeline-tags { gap: 4px; }
     .tag-atividade { font-size: 11px; padding: 4px 8px; }
 
@@ -237,43 +245,37 @@
     /* CAPÍTULO 7: WIZARD E CONFIGURAÇÕES                                         */
     /* ========================================================================== */
     .form-row { flex-direction: column; gap: 16px; }
-    
-    /* Simplifica o Stepper visualmente */
-    .stepper { flex-wrap: wrap; justify-content: center; gap: 8px;}
-    .step span:not(.step-num) { display: none; /* Esconde textos no celular */ }
-    .step-line { width: 40px; margin: 0 4px; flex: none; }
-
-    /* Ajuste crítico do Day Card e Segmented Control */
+    .stepper { display: none; } /* Stepper completo é complexo demais para mobile */
     .day-card { flex-direction: column; gap: 16px; align-items: stretch; padding: 16px; }
     .day-header { width: 100%; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
     .day-controls { width: 100%; flex-direction: column; gap: 16px;}
-    
-    /* O Segmented Control vira um Grid 2x2 para caber sem quebrar layout */
-    .segmented-control { 
-        display: grid; 
-        grid-template-columns: 1fr 1fr; 
-        gap: 8px; 
-        max-width: 100%; 
-        background: transparent;
-        padding: 0;
-    }
-    
-    .segmented-control label { 
-        background: #F1F5F9; 
-        border: 1px solid var(--border-color);
-        padding: 10px 0;
-    }
-    
-    .segmented-control label:has(input:checked) { 
-        border-color: var(--color-primary); 
-    }
-
-    .slots-input { width: 100%; justify-content: space-between; background: #F8FAFC; padding: 12px; border-radius: 8px;}
+    .segmented-control { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 100%; background: transparent; padding: 0; }
+    .segmented-control label { background: #F1F5F9; border: 1px solid var(--border-color); padding: 10px 0; }
+    .segmented-control label:has(input:checked) { border-color: var(--color-primary); }
+    .slots-input { width: 100%; justify-content: space-between; background: #F8FAFC; padding: 8px; border-radius: 8px;}
+    .input-stepper { flex: 1; justify-content: flex-end; }
+    .input-stepper input { max-width: 80px; }
 
     /* ========================================================================== */
-    /* CAPÍTULO 8: MODAIS (JANELAS) E UTILITÁRIOS                                 */
+    /* CAPÍTULO 8: COMPONENTES DE AÇÃO MOBILE (FAB E BARRA FIXA)                  */
+    /* Ativa e posiciona os componentes que estavam escondidos no desktop         */
     /* ========================================================================== */
-    /* Modais viram "Bottom Sheets" ou ocupam quase a tela toda */
+    .fab {
+        display: flex; /* Ativa o FAB */
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 70px + 16px); /* Acima da nav bar */
+        right: 16px;
+    }
+    
+    .bottom-action-bar {
+        display: flex; /* Ativa a Barra de Ação */
+        /* O padding já vem do CSS global, ajustando para a nav bar inferior */
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+        bottom: 70px;
+    }
+
+    /* ========================================================================== */
+    /* CAPÍTULO 9: MODAIS (JANELAS) E UTILITÁRIOS                                 */
+    /* ========================================================================== */
     .modal-content {
         max-width: 100%;
         margin: 16px;
@@ -282,9 +284,9 @@
     }
 
     .toast-container {
-        bottom: 80px; /* Acima da Navigation bar */
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 80px); /* Acima da nav bar */
         right: 16px;
-        left: 16px; /* Centraliza toasts no mobile */
+        left: 16px;
         align-items: center;
     }
 

@@ -90,7 +90,7 @@
 /* CAPÍTULO 4: UI MODERNA DE TABELAS (CORES E RESPONSIVIDADE)                 */
 /* ========================================================================== */
 
-/* Dicas Visuais de Status na Fila (Meu Plano) */
+/* --- SEÇÃO 4.1: CORES DE STATUS DA FILA (MEU PLANO) --- */
 .row-active td { 
     background-color: #F0F9FF !important; /* Azul muito claro (Em andamento) */
 }
@@ -103,16 +103,22 @@
     opacity: 0.9;
 }
 
+/* --- SEÇÃO 4.2: PAGINAÇÃO --- */
+/* Por padrão, esconde a paginação mobile em telas maiores */
+.pagination-controls-mobile {
+    display: none;
+}
+
 /* ========================================================================== */
 /* CAPÍTULO 5: LAYOUT E COMPONENTES ESPECÍFICOS                               */
 /* ========================================================================== */
 
-/* Destaque Dashboard */
+/* --- SEÇÃO 5.1: DASHBOARD --- */
 .card-highlight { background-color: var(--color-primary); border: none; }
 .card-highlight h3, .card-highlight .label { color: #BFDBFE; }
 .card-highlight .metric { color: #FFFFFF; }
 
-/* Timeline do Cronograma (Visão da Semana) */
+/* --- SEÇÃO 5.2: TIMELINE DO CRONOGRAMA --- */
 .timeline-container { display: flex; flex-direction: column; gap: 0; background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
 .timeline-item { display: flex; gap: 24px; position: relative; padding-bottom: 24px; }
 .timeline-item:last-child { padding-bottom: 0; }
@@ -128,19 +134,18 @@
 .timeline-title { font-size: 13px; font-weight: 600; text-transform: capitalize; color: var(--text-muted); margin-bottom: 8px; display: block; }
 .timeline-tags { display: flex; flex-wrap: wrap; gap: 6px; }
 
-/* Tags Consolidadas (Diário e Timeline) */
+/* --- SEÇÃO 5.3: TAGS E BADGES --- */
 .tag-atividade { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 .tag-teoria { background: var(--slot-teoria-bg); color: var(--slot-teoria-text); border: 1px solid var(--slot-teoria-border); }
 .tag-questoes { background: var(--slot-questoes-bg); color: var(--slot-questoes-text); border: 1px solid var(--slot-questoes-border); }
 .tag-manutencao { background: var(--slot-manutencao-bg); color: var(--slot-manutencao-text); border: 1px solid var(--slot-manutencao-border); }
 
-/* Badges de Peso (Meu Plano) */
 .badge-peso { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 .badge-high { background: #FEF2F2; color: #991B1B; }
 .badge-medium { background: #FFFBEB; color: #B45309; }
 .badge-low { background: #F1F5F9; color: #475569; }
 
-/* Divisores Elegantes (Meu Plano) */
+/* --- SEÇÃO 5.4: DIVISORES --- */
 .row-cut-off td { background: transparent !important; border: none !important; padding: 32px 8px 16px 8px; }
 .cut-off-divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 .cut-off-divider::before, .cut-off-divider::after { content: ''; flex: 1; border-bottom: 1px dashed #CBD5E1; margin: 0 16px; }
@@ -148,6 +153,8 @@
 /* ========================================================================== */
 /* CAPÍTULO 6: ASSISTENTE DE CONFIGURAÇÃO (WIZARD)                            */
 /* ========================================================================== */
+
+/* --- SEÇÃO 6.1: STEPPER VISUAL --- */
 .stepper { display: flex; align-items: center; justify-content: space-between; }
 .step { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); }
 .step.active { color: var(--color-primary); }
@@ -155,13 +162,10 @@
 .step.active .step-num { background: var(--color-primary); color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
 .step-line { flex: 1; height: 2px; background: #E2E8F0; margin: 0 24px; }
 
+/* --- SEÇÃO 6.2: CONTROLES DE INPUT --- */
 .slider-group { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
 .custom-slider { flex: 1; accent-color: var(--color-primary); cursor: pointer; }
 .slider-output { font-weight: 600; color: var(--color-primary); background: #EFF6FF; padding: 4px 12px; border-radius: 12px; font-size: 14px; min-width: 80px; text-align: center; }
-
-.day-card { border: 1px solid var(--border-color); border-left-width: 5px; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 12px; transition: all 0.3s ease; background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-.day-header { font-weight: 600; font-size: 15px; width: 120px; flex-shrink: 0; }
-.day-controls { display: flex; gap: 24px; flex: 1; align-items: center; justify-content: space-between; }
 
 .segmented-control { display: flex; background: #F1F5F9; border-radius: 8px; padding: 4px; gap: 4px; flex: 1; max-width: 400px; }
 .segmented-control label { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
@@ -172,7 +176,87 @@
 .slots-input label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .slots-input input { width: 70px; text-align: center; font-weight: 600; }
 
+/* --- SEÇÃO 6.3: INPUT STEPPER (CONTROLE NUMÉRICO) --- */
+.input-stepper { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: var(--radius-md); overflow: hidden; }
+.input-stepper input { border: none !important; box-shadow: none !important; border-radius: 0; }
+.input-stepper input::-webkit-outer-spin-button, 
+.input-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+/* stylelint-disable-next-line property-no-vendor-prefix */
+.input-stepper input[type=number] { appearance: none; -moz-appearance: textfield; }
+
+.btn-step {
+    width: 38px; height: 38px; border: none; background-color: #F8FAFC;
+    color: var(--text-muted); font-size: 20px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+}
+.btn-step:hover { background-color: #F1F5F9; color: var(--color-primary); }
+.btn-step:first-child { border-right: 1px solid var(--border-color); }
+.btn-step:last-child { border-left: 1px solid var(--border-color); }
+
+/* --- SEÇÃO 6.4: DAY CARDS --- */
+.day-card { border: 1px solid var(--border-color); border-left-width: 5px; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 12px; transition: all 0.3s ease; background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
+.day-header { font-weight: 600; font-size: 15px; width: 120px; flex-shrink: 0; }
+.day-controls { display: flex; gap: 24px; flex: 1; align-items: center; justify-content: space-between; }
+
 .day-card:has(input[value="teoria"]:checked) { border-left-color: var(--color-primary); background-color: #FAFCFF; }
 .day-card:has(input[value="questoes"]:checked) { border-left-color: var(--color-warning); background-color: #FFFCF5; }
 .day-card:has(input[value="manutencao"]:checked) { border-left-color: var(--color-success); background-color: #F6FDF9; }
 .day-card:has(input[value="descanso"]:checked) { border-left-color: var(--color-secondary); background-color: #F8FAFC; opacity: 0.8; }
+
+/* ========================================================================== */
+/* CAPÍTULO 7: COMPONENTES DE AÇÃO MOBILE-FIRST (NOVOS)                       */
+/* Estes componentes são projetados para mobile e ficam escondidos no desktop */
+/* ========================================================================== */
+
+/* --- SEÇÃO 7.1: FLOATING ACTION BUTTON (FAB) --- */
+.fab {
+    display: none; /* Ativado apenas no mobile.css */
+    position: fixed;
+    bottom: 90px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: var(--color-primary);
+    color: var(--text-inverse);
+    border: none;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    transition: transform 0.2s ease-out, background-color 0.2s;
+}
+.fab:hover {
+    background-color: var(--color-primary-hover);
+    transform: scale(1.05);
+}
+.fab .material-symbols-outlined {
+    font-size: 28px;
+}
+/* Por padrão, o FAB fica escondido no desktop */
+.fab { display: none; }
+
+/* --- SEÇÃO 7.2: BARRA DE AÇÕES INFERIOR FIXA (CONFIGURAÇÕES) --- */
+.bottom-action-bar {
+    display: none; /* Ativado apenas no mobile.css */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    border-top: 1px solid var(--border-color);
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+}
+.bottom-action-bar button {
+    width: 100%;
+    max-width: 400px;
+}
+/* Por padrão, a barra fica escondida no desktop */
+.bottom-action-bar { display: none; }

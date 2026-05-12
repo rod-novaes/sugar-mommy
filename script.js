@@ -75,6 +75,8 @@ const formMateria = document.getElementById('form-materia');
 const modalRegistro = document.getElementById('modal-registro');
 const formRegistro = document.getElementById('form-registro');
 const modalConfirm = document.getElementById('modal-confirm');
+const fabAddMateria = document.getElementById('fab-add-materia'); // NOVO: FAB Matéria
+const fabAddRegistro = document.getElementById('fab-add-registro'); // NOVO: FAB Registro
 let editingMateriaId = null;
 let editingRegistroId = null;
 
@@ -85,6 +87,7 @@ let confirmActionCallback = null;
 const formConfig = document.getElementById('form-config');
 const btnSalvarConfig = document.getElementById('btn-salvar-config');
 const alertaMatriz = document.getElementById('alerta-matriz');
+const matrizSemanalContainer = document.getElementById('matriz-semanal-container'); // NOVO: Container para event delegation
 
 // View: Cronograma
 const containerHojeSlots = document.getElementById('hoje-slots-container');
@@ -377,7 +380,7 @@ function renderPlan() {
         else pesoVisual = `<span class="badge-peso badge-low">Baixa</span>`;
 
         let badge = '';
-        let rowColorClass = ''; // Nova lógica de cores de linha
+        let rowColorClass = '';
         
         if (isConcluida) {
             badge = `<span class="status-badge" style="background: #DCFCE7; color: #166534;">Finalizada</span>`;
@@ -395,15 +398,33 @@ function renderPlan() {
 
         const tr = document.createElement('tr');
         tr.dataset.id = mat.id;
-        tr.className = rowColorClass; // Aplica a cor de fundo inteligente
+        tr.className = rowColorClass;
         
-        // Atributos data-label permitem que o CSS transforme a tabela em Cards perfeitos no celular
         tr.innerHTML = `
             <td class="drag-handle" title="Arraste para reordenar"><span class="material-symbols-outlined">drag_indicator</span></td>
-            <td data-label="Matéria"><strong>${mat.nome}</strong> ${badge}</td>
-            <td data-label="Prioridade">${pesoVisual}</td>
-            <td data-label="Teoria">${stats.teoriaFeita} / ${mat.sessoes}</td>
-            <td data-label="Questões">${stats.questoesFeitas} / ${mat.questoes}</td>
+            <td data-label="Matéria">
+                <!-- Conteúdo para o card mobile -->
+                <strong>${mat.nome}</strong> ${badge}
+                <!-- Fim do conteúdo para card mobile -->
+            </td>
+            <td data-label="Prioridade">
+                <!-- Conteúdo para o card mobile -->
+                <span class="card-label">Prioridade</span>
+                <!-- Fim do conteúdo para card mobile -->
+                ${pesoVisual}
+            </td>
+            <td data-label="Teoria">
+                <!-- Conteúdo para o card mobile -->
+                <span class="card-label">Teoria</span>
+                <!-- Fim do conteúdo para card mobile -->
+                ${stats.teoriaFeita} / ${mat.sessoes}
+            </td>
+            <td data-label="Questões">
+                <!-- Conteúdo para o card mobile -->
+                <span class="card-label">Questões</span>
+                <!-- Fim do conteúdo para card mobile -->
+                ${stats.questoesFeitas} / ${mat.questoes}
+            </td>
             <td data-label="Progresso">
                 <div class="table-progress-container">
                     <div class="table-progress-text">${Math.floor(percentualFinal)}%</div>
@@ -482,10 +503,7 @@ function renderCronograma() {
             if (!isDone) {
                 card.addEventListener('click', () => {
                     showConfirmModal(`Confirmar a conclusão da sessão de ${slot.nome}?`, () => {
-                        // 1. Adiciona a classe de animação (Dopamina visual)
                         card.classList.add('anim-success');
-                        
-                        // 2. Aguarda a animação rodar antes de recarregar o sistema (500ms)
                         setTimeout(() => {
                             const novoReg = {
                                 id: Date.now().toString(),
@@ -813,12 +831,17 @@ function renderDiary() {
         if (m > 0) tagsAtividade += `<span class="tag-atividade tag-manutencao" style="margin-right:4px;">${m} Revisão</span>`;
 
         const tr = document.createElement('tr');
-        // Data-labels para mobile views
+        
+        // NOVO: Renderização otimizada para o card mobile do Diário
         tr.innerHTML = `
-            <td data-label="Data">${dt}</td>
-            <td data-label="Matéria"><strong>${nomeMateria}</strong></td>
+            <td data-label="Data">
+                <div class="diary-card-header">
+                    <span>${dt}</span>
+                    <strong data-label="Matéria">${nomeMateria}</strong>
+                </div>
+            </td>
             <td data-label="Atividades">${tagsAtividade}</td>
-            <td data-label="Comentário"><small class="text-muted">${reg.comentario || '-'}</small></td>
+            <td data-label="Comentário">${reg.comentario ? `<small class="text-muted">${reg.comentario}</small>`:''}</td>
             <td data-label="Ações" class="text-center">
                 <button class="btn btn-icon" onclick="editRegistro('${reg.id}')" title="Editar" style="color: var(--color-primary);"><span class="material-symbols-outlined icon-sm">edit</span></button>
                 <button class="btn btn-icon" onclick="deleteRegistro('${reg.id}')" title="Excluir" style="color: var(--color-danger);"><span class="material-symbols-outlined icon-sm">delete</span></button>
@@ -837,10 +860,17 @@ function renderDiary() {
         const selectSize = document.getElementById('diary-page-size');
         if (selectSize && selectSize.value != diarioItemsPerPage) selectSize.value = diarioItemsPerPage;
 
-        document.getElementById('btn-page-first').disabled = diarioCurrentPage === 1;
-        document.getElementById('btn-page-prev').disabled = diarioCurrentPage === 1;
-        document.getElementById('btn-page-next').disabled = diarioCurrentPage === totalPages;
-        document.getElementById('btn-page-last').disabled = diarioCurrentPage === totalPages;
+        // ATUALIZADO: Controla o estado de todos os botões (desktop e mobile)
+        const isFirstPage = diarioCurrentPage === 1;
+        const isLastPage = diarioCurrentPage === totalPages;
+
+        document.getElementById('btn-page-first').disabled = isFirstPage;
+        document.getElementById('btn-page-prev').disabled = isFirstPage;
+        document.getElementById('btn-page-prev-mobile').disabled = isFirstPage;
+
+        document.getElementById('btn-page-next').disabled = isLastPage;
+        document.getElementById('btn-page-last').disabled = isLastPage;
+        document.getElementById('btn-page-next-mobile').disabled = isLastPage;
     }
 }
 
@@ -1072,7 +1102,6 @@ document.querySelectorAll('.modal-close-btn, .modal-cancel-btn').forEach(btn => 
 // Fechamento de modais clicando fora da caixa de conteúdo (no overlay escuro)
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', (e) => {
-        // Se o clique foi EXATAMENTE no fundo preto (não nos filhos), feche o modal.
         if (e.target === overlay) closeModal(overlay);
     });
 });
@@ -1131,13 +1160,45 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Modais Form Buttons
+    // Modais Form Buttons (Desktop)
     document.getElementById('btn-add-materia')?.addEventListener('click', () => openModal(modalMateria));
     document.getElementById('btn-add-registro')?.addEventListener('click', () => {
         document.getElementById('reg-data').value = getTodayStr();
         openModal(modalRegistro);
     });
 
+    // --- SEÇÃO NOVA: Lógica para os componentes mobile-first ---
+    // Floating Action Buttons
+    fabAddMateria?.addEventListener('click', () => openModal(modalMateria));
+    fabAddRegistro?.addEventListener('click', () => {
+        document.getElementById('reg-data').value = getTodayStr();
+        openModal(modalRegistro);
+    });
+
+    // Input Steppers (+/-) nas Configurações
+    matrizSemanalContainer?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.btn-step');
+        if (!btn) return;
+    
+        const input = btn.parentElement.querySelector('input[type="number"]');
+        if (!input) return;
+    
+        let value = parseInt(input.value, 10) || 0;
+        const min = parseInt(input.min, 10);
+        const action = btn.dataset.action;
+    
+        if (action === 'increment') {
+            value++;
+        } else if (action === 'decrement' && value > min) {
+            value--;
+        }
+    
+        input.value = value;
+        // Dispara um evento de 'input' para que o listener do formulário
+        // detecte a mudança e habilite o botão de salvar.
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    
     // Arquivos IO
     btnSalvar.addEventListener('click', () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
