@@ -192,6 +192,8 @@ h1, h2, h3, h4 {
 /* ========================================================================== */
 
 /* --- 3.1 BOTÕES --- */
+.fab-mobile-only { display: none; }
+
 .btn {
     display: inline-flex;
     align-items: center;
@@ -493,7 +495,7 @@ tr:last-child td { border-bottom: none; }
 
 @media (max-width: 768px) {
     /* Estrutura Base */
-    body { overscroll-behavior-y: none; }
+    body { overscroll-behavior-y: none; background-color: #F1F5F9; }
     #app-body { flex-direction: column; }
     
     /* Espaço extra no fundo para não ser coberto pela Navigation Bar */
@@ -527,21 +529,29 @@ tr:last-child td { border-bottom: none; }
     .chart-card { min-height: auto; width: 100%; overflow: hidden; padding: 16px;}
     .chart-wrapper { width: 100%; min-width: 0; overflow-x: auto; }
 
-    /* Botões Flutuantes (FABs) */
-    .fab-mobile {
+    /* Botões Flutuantes (FABs) e Ocultação Desktop */
+    .desktop-btn { display: none; }
+    
+    .fab-mobile-only:not(.hidden) {
+        display: flex;
         position: fixed;
         bottom: 90px;
         right: 16px;
         width: 56px;
         height: 56px;
         border-radius: 50%;
-        padding: 0;
+        background-color: var(--color-primary);
+        color: var(--text-inverse);
+        border: none;
         box-shadow: var(--shadow-lg);
-        z-index: 90;
+        z-index: 1000;
+        align-items: center;
         justify-content: center;
+        cursor: pointer;
+        transition: transform 0.2s;
     }
-    .fab-mobile .fab-text { display: none; }
-    .fab-mobile .material-symbols-outlined { font-size: 28px; }
+    .fab-mobile-only:active { transform: scale(0.95); }
+    .fab-mobile-only .material-symbols-outlined { font-size: 28px; }
 
     /* Tabelas viram Cards (Base) */
     .table-container { background: transparent; border: none; box-shadow: none; }
@@ -621,9 +631,9 @@ tr:last-child td { border-bottom: none; }
 
     /* Modais, Toasts e Touch Targets */
     .modal-content {
-        max-width: 100%; margin: auto 16px; 
-        /* Previne o teclado de cobrir o botão de ação limitando o modal dinamicamente */
-        max-height: calc(100dvh - 48px); 
+        max-width: 100%; margin: 32px 16px; 
+        /* Força margem segura e habilita barra de rolagem interna mais cedo */
+        max-height: calc(100dvh - 120px); 
         overflow-y: auto;
     }
     .modal-body {

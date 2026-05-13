@@ -194,8 +194,8 @@
                             <h2>Meu Plano</h2>
                             <p class="subtitle">Cadastre suas matérias e arraste (☰) para definir a ordem de prioridade na fila.</p>
                         </div>
-                        <button class="btn btn-primary fab-mobile" id="btn-add-materia">
-                            <span class="material-symbols-outlined">add</span> <span class="fab-text">Nova Matéria</span>
+                        <button class="btn btn-primary desktop-btn" id="btn-add-materia">
+                            <span class="material-symbols-outlined">add</span> Nova Matéria
                         </button>
                     </header>
 
@@ -236,8 +236,8 @@
                             <h2>Diário de Estudos</h2>
                             <p class="subtitle">Histórico de suas atividades. O cronograma se ajusta com base nisso.</p>
                         </div>
-                        <button class="btn btn-primary fab-mobile" id="btn-add-registro">
-                            <span class="material-symbols-outlined">add</span> <span class="fab-text">Registro Manual</span>
+                        <button class="btn btn-primary desktop-btn" id="btn-add-registro">
+                            <span class="material-symbols-outlined">add</span> Registro Manual
                         </button>
                     </header>
 
@@ -485,6 +485,14 @@
                 </section>
 
             </main>
+
+            <!-- Botões Flutuantes Exclusivos do Mobile (FABs) -->
+            <button class="fab-mobile-only hidden" id="fab-add-materia" title="Nova Matéria">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+            <button class="fab-mobile-only hidden" id="fab-add-registro" title="Registro Manual">
+                <span class="material-symbols-outlined">add</span>
+            </button>
         </div>
     </div>
 

@@ -888,9 +888,16 @@ const Controllers = {
             });
         });
 
-        // Modais de Ação Simples
+        // Modais de Ação Simples (Desktop)
         document.getElementById('btn-add-materia')?.addEventListener('click', () => Utils.openModal(DOM.modalMateria));
         document.getElementById('btn-add-registro')?.addEventListener('click', () => {
+            document.getElementById('reg-data').value = Utils.getTodayStr();
+            Utils.openModal(DOM.modalRegistro);
+        });
+
+        // Modais de Ação Simples (Mobile FABs)
+        document.getElementById('fab-add-materia')?.addEventListener('click', () => Utils.openModal(DOM.modalMateria));
+        document.getElementById('fab-add-registro')?.addEventListener('click', () => {
             document.getElementById('reg-data').value = Utils.getTodayStr();
             Utils.openModal(DOM.modalRegistro);
         });
@@ -941,9 +948,17 @@ const Controllers = {
 
     switchView(targetViewId) {
         DOM.modais.forEach(modal => Utils.closeModal(modal));
+
         DOM.views.forEach(view => view.classList.add('hidden'));
         const targetView = document.getElementById(targetViewId);
         if (targetView) targetView.classList.remove('hidden');
+
+        // Controle de Visibilidade dos Botões Flutuantes (Mobile)
+        const fabMateria = document.getElementById('fab-add-materia');
+        const fabRegistro = document.getElementById('fab-add-registro');
+        if (fabMateria) fabMateria.classList.toggle('hidden', targetViewId !== 'view-plan');
+        if (fabRegistro) fabRegistro.classList.toggle('hidden', targetViewId !== 'view-diary');
+
         Views.renderAll();
     },
 
