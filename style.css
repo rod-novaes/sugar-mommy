@@ -560,10 +560,11 @@ tr:last-child td { border-bottom: none; }
     
     .table-container tr:not(.empty-state, .row-cut-off) { 
         margin-bottom: 20px; 
-        border: none; /* Remove a borda sólida com cara de tabela */
-        border-radius: var(--radius-lg); /* Aumenta o arredondamento para 12px */
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); /* Sombra mais difusa e espalhada */
-        overflow: hidden; /* Garante que o fundo não vaze as bordas arredondadas */
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg); 
+        box-shadow: var(--shadow-sm); 
+        overflow: hidden; 
     }
 
     /* Marcadores laterais coloridos apenas para a tela Meu Plano */
@@ -600,13 +601,13 @@ tr:last-child td { border-bottom: none; }
     /* Layout Específico: Card do Diário */
     #tabela-historico tr:not(.empty-state) { display: grid; grid-template-columns: auto 1fr; padding: 0; }
     
-    #tabela-historico td[data-label="Data"] { grid-column: 1 / 2; border-bottom: none; padding-right: 8px; padding-bottom: 0; }
+    #tabela-historico td[data-label="Data"] { grid-column: 1 / 2; grid-row: 1; border-bottom: none; padding-right: 8px; padding-bottom: 0; }
     #tabela-historico td[data-label="Data"]::before { display: none; }
     
-    #tabela-historico td[data-label="Atividades"] { grid-column: 2 / 3; border-bottom: none; padding-left: 8px; padding-bottom: 0; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; gap: 4px; }
+    #tabela-historico td[data-label="Atividades"] { grid-column: 2 / 3; grid-row: 1; border-bottom: none; padding-left: 8px; padding-bottom: 0; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; gap: 4px; }
     #tabela-historico td[data-label="Atividades"]::before { display: none; }
     
-    #tabela-historico td[data-label="Matéria"] { grid-column: 1 / -1; border-bottom: none; padding-top: 4px; }
+    #tabela-historico td[data-label="Matéria"] { grid-column: 1 / -1; grid-row: 2; border-bottom: none; padding-top: 8px; padding-bottom: 16px; }
     #tabela-historico td[data-label="Matéria"]::before { display: none; }
     #tabela-historico td[data-label="Matéria"] strong { font-size: 15px; color: var(--color-primary); }
     
