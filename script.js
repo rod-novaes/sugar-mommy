@@ -1022,7 +1022,7 @@ const Controllers = {
     },
 
     deleteMateria(id) {
-        Utils.showConfirmModal('Excluir esta matéria e tirá-la da fila de estudos permanentemente?', () => {
+        Utils.showConfirmModal('Excluir esta matéria e tirá-la da fila de estudo permanentemente?', () => {
             Store.state.materias = Store.state.materias.filter(m => m.id !== id);
             Store.save();
             Views.renderAll();
