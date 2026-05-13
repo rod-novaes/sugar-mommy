@@ -940,6 +940,7 @@ const Controllers = {
     },
 
     switchView(targetViewId) {
+        DOM.modais.forEach(modal => Utils.closeModal(modal));
         DOM.views.forEach(view => view.classList.add('hidden'));
         const targetView = document.getElementById(targetViewId);
         if (targetView) targetView.classList.remove('hidden');

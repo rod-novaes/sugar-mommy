@@ -394,7 +394,7 @@ tr:last-child td { border-bottom: none; }
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(2px);
-    display: flex; align-items: center; justify-content: center; z-index: 100;
+    display: flex; align-items: center; justify-content: center; z-index: 2000;
 }
 .modal-content {
     background-color: var(--bg-surface); width: 100%; max-width: 500px;
@@ -436,7 +436,7 @@ tr:last-child td { border-bottom: none; }
 /* Keyframes Globais e Microinterações                                        */
 /* ========================================================================== */
 
-@keyframes fadeInView { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeInView { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 .view:not(.hidden) { animation: fadeInView 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
 @keyframes fadeInModal { from { opacity: 0; backdrop-filter: blur(0px); } to { opacity: 1; backdrop-filter: blur(2px); } }
@@ -549,8 +549,8 @@ tr:last-child td { border-bottom: none; }
     .table-container thead tr { position: absolute; top: -9999px; left: -9999px; }
     
     .table-container tr:not(.empty-state, .row-cut-off) { 
-        margin-bottom: 16px; border: 1px solid var(--border-color); 
-        border-radius: var(--radius-md); box-shadow: var(--shadow-sm); 
+        margin-bottom: 20px; border: 1px solid #CBD5E1; 
+        border-radius: var(--radius-md); box-shadow: var(--shadow-md); 
     }
     
     .table-container td:not(.drag-handle) { 
@@ -621,9 +621,9 @@ tr:last-child td { border-bottom: none; }
 
     /* Modais, Toasts e Touch Targets */
     .modal-content {
-        max-width: 100%; margin: 16px; 
+        max-width: 100%; margin: auto 16px; 
         /* Previne o teclado de cobrir o botão de ação limitando o modal dinamicamente */
-        max-height: calc(100dvh - 32px); 
+        max-height: calc(100dvh - 48px); 
         overflow-y: auto;
     }
     .modal-body {
