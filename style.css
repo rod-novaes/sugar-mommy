@@ -583,20 +583,24 @@ tr:last-child td { border-bottom: none; }
     .row-cut-off td { padding: 24px 0 16px 0; background: transparent; }
 
     /* Layout Específico: Card do Meu Plano */
-    #tabela-materias tr:not(.empty-state, .row-cut-off) { display: grid; grid-template-columns: 1fr 1fr; padding: 0; }
-    #tabela-materias td.drag-handle { grid-column: 1 / -1; padding: 8px; border-bottom: 1px solid var(--border-color); text-align: center; background: #F8FAFC; border-radius: 4px 4px 0 0; }
+    #tabela-materias tr:not(.empty-state, .row-cut-off) { display: grid; grid-template-columns: 1fr auto; padding: 0; }
     
-    #tabela-materias td[data-label="Matéria"] { grid-column: 1 / 2; border-bottom: none; }
+    #tabela-materias td.drag-handle { grid-column: 1 / -1; grid-row: 1; padding: 8px; border-bottom: 1px solid var(--border-color); text-align: center; background: #F8FAFC; border-radius: 4px 4px 0 0; }
+    
+    #tabela-materias td[data-label="Matéria"] { grid-column: 1 / 2; grid-row: 2; border-bottom: none; padding-right: 8px; padding-bottom: 0; }
     #tabela-materias td[data-label="Matéria"]::before { display: none; }
+    #tabela-materias td[data-label="Matéria"] strong { font-size: 15px; color: var(--color-primary); }
     
-    #tabela-materias td[data-label="Prioridade"] { grid-column: 2 / 3; border-bottom: none; align-items: flex-end; }
+    #tabela-materias td[data-label="Prioridade"] { grid-column: 2 / 3; grid-row: 2; border-bottom: none; align-items: flex-end; padding-left: 8px; padding-bottom: 0; }
     #tabela-materias td[data-label="Prioridade"]::before { display: none; }
     
-    #tabela-materias td[data-label="Teoria"] { grid-column: 1 / 2; border-right: 1px solid var(--border-color); border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color); background: rgba(0,0,0, 0.02); }
-    #tabela-materias td[data-label="Questões"] { grid-column: 2 / 3; border-top: 1px dashed var(--border-color); border-bottom: 1px dashed var(--border-color); background: rgba(0,0,0, 0.02); }
+    /* Ocultando Teoria e Questões no Card Mobile (Progressive Disclosure) */
+    #tabela-materias td[data-label="Teoria"],
+    #tabela-materias td[data-label="Questões"] { display: none !important; }
     
-    #tabela-materias td[data-label="Progresso"] { grid-column: 1 / -1; border-bottom: none; }
-    #tabela-materias td[data-label="Ações"] { grid-column: 1 / -1; flex-direction: row; justify-content: space-around; align-items: center; background-color: rgba(0,0,0, 0.03); border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 8px; border-top: 1px solid var(--border-color); }
+    #tabela-materias td[data-label="Progresso"] { grid-column: 1 / -1; grid-row: 3; border-bottom: none; padding-top: 12px; padding-bottom: 16px; }
+    
+    #tabela-materias td[data-label="Ações"] { grid-column: 1 / -1; grid-row: 4; flex-direction: row; justify-content: space-around; align-items: center; background-color: #F8FAFC; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 8px; border-top: 1px solid var(--border-color); }
 
     /* Layout Específico: Card do Diário */
     #tabela-historico tr:not(.empty-state) { display: grid; grid-template-columns: auto 1fr; padding: 0; }
