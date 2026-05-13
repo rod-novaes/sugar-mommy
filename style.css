@@ -499,7 +499,7 @@ tr:last-child td { border-bottom: none; }
     #app-body { flex-direction: column; }
     
     /* Espaço extra no fundo para não ser coberto pela Navigation Bar */
-    #main-content { padding: 16px 16px 90px 16px; overflow-x: hidden; }
+    #main-content { padding: 16px 16px 140px 16px; overflow-x: hidden; }
 
     /* Header */
     #top-header { padding: 0 16px; height: 64px; }
@@ -559,9 +559,17 @@ tr:last-child td { border-bottom: none; }
     .table-container thead tr { position: absolute; top: -9999px; left: -9999px; }
     
     .table-container tr:not(.empty-state, .row-cut-off) { 
-        margin-bottom: 20px; border: 1px solid #CBD5E1; 
-        border-radius: var(--radius-md); box-shadow: var(--shadow-md); 
+        margin-bottom: 20px; 
+        border: none; /* Remove a borda sólida com cara de tabela */
+        border-radius: var(--radius-lg); /* Aumenta o arredondamento para 12px */
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); /* Sombra mais difusa e espalhada */
+        overflow: hidden; /* Garante que o fundo não vaze as bordas arredondadas */
     }
+
+    /* Marcadores laterais coloridos apenas para a tela Meu Plano */
+    #tabela-materias tr.row-active { border-left: 5px solid var(--color-primary); }
+    #tabela-materias tr.row-waitlist { border-left: 5px solid #94A3B8; }
+    #tabela-materias tr.row-completed { border-left: 5px solid var(--color-success); }
     
     .table-container td:not(.drag-handle) { 
         border: none; padding: 12px 16px; text-align: left; 
@@ -606,6 +614,32 @@ tr:last-child td { border-bottom: none; }
     
     #tabela-historico td[data-label="Ações"] { grid-column: 1 / -1; flex-direction: row; justify-content: space-around; align-items: center; background-color: #F8FAFC; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 8px; border-top: 1px solid var(--border-color); }
 
+    /* Paginação Redesenhada (Diário de Estudos) */
+    .pagination-footer {
+        flex-direction: column-reverse; /* Inverte a ordem: botões em cima, texto embaixo */
+        gap: 16px;
+        background: transparent; /* Remove o fundo branco */
+        border: none;
+        padding: 16px 0 0 0;
+    }
+    
+    .pagination-controls {
+        width: 100%;
+        justify-content: center;
+        gap: 16px; /* Mais espaço entre os botões */
+    }
+    
+    .btn-page {
+        width: 48px; /* Alvos de clique super ergonômicos */
+        height: 48px;
+        border-radius: 50%; /* Botões redondos combinam mais com o mobile */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .pagination-info { width: 100%; text-align: center; }
+    .select-page-size { display: none; } /* Esconde o Dropdown no celular */
+    #diary-page-info { margin-left: 0; display: block; font-size: 12px; color: #94A3B8; }
+    
     /* Timeline */
     .slots-grid { grid-template-columns: 1fr; }
     .timeline-item { flex-direction: column; gap: 8px; padding-left: 28px; padding-bottom: 32px; }
