@@ -625,7 +625,7 @@ const Views = {
                 onboardingEl.innerHTML = `
                     <span class="material-symbols-outlined empty-icon" style="font-size: 64px; color: var(--color-primary); opacity: 1; margin-bottom: 16px;">rocket_launch</span>
                     <h3>Bem-vindo ao Sugar Mommy Planner!</h3>
-                    <p>Sua inteligência artificial particular para os estudos. Notei que seu plano ainda não foi configurado. Vamos dar o primeiro passo?</p>
+                    <p>Sua assistente particular para os estudos. Notei que seu plano ainda não foi configurado. Vamos dar o primeiro passo?</p>
                     <div class="onboarding-actions">
                         <button class="btn btn-primary btn-min-w" onclick="Controllers.switchView('view-config')">
                             <span class="material-symbols-outlined">settings</span> 1. Configurar Minha Rotina
