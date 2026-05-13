@@ -117,26 +117,52 @@ const Utils = {
     },
 
     openModal(el) {
-        if (el) el.classList.remove('hidden');
+        if (!el) return;
+        el.classList.remove('hidden');
+        
+        // Animação GSAP: Fundo aparece suavemente
+        gsap.fromTo(el, 
+            { opacity: 0, backdropFilter: "blur(0px)" }, 
+            { opacity: 1, backdropFilter: "blur(2px)", duration: 0.3 }
+        );
+        
+        // Animação GSAP: Modal ganha vida com um leve "pulo" (back.out)
+        const content = el.querySelector('.modal-content');
+        if (content) {
+            gsap.fromTo(content, 
+                { y: 30, scale: 0.95, opacity: 0 }, 
+                { y: 0, scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }
+            );
+        }
     },
 
     closeModal(el) {
         if (!el) return;
-        el.classList.add('hidden');
         
-        if (el.id === 'modal-materia') { 
-            DOM.formMateria.reset(); 
-            AppContext.editingMateriaId = null; 
-            DOM.modalMateriaTitle.textContent = 'Adicionar Matéria';
-        }
-        if (el.id === 'modal-registro') { 
-            DOM.formRegistro.reset(); 
-            AppContext.editingRegistroId = null;
-            DOM.modalRegistroTitle.textContent = 'Registro Manual';
-        }
-        if (el.id === 'modal-confirm') {
-            AppContext.confirmActionCallback = null;
-        }
+        const content = el.querySelector('.modal-content');
+        if (content) gsap.to(content, { y: 20, scale: 0.95, opacity: 0, duration: 0.2, ease: "power2.in" });
+        
+        gsap.to(el, { 
+            opacity: 0, backdropFilter: "blur(0px)", duration: 0.2, delay: 0.1,
+            onComplete: () => {
+                el.classList.add('hidden');
+                
+                // Limpeza segura dos formulários após o modal sumir
+                if (el.id === 'modal-materia') { 
+                    DOM.formMateria.reset(); 
+                    AppContext.editingMateriaId = null; 
+                    DOM.modalMateriaTitle.textContent = 'Adicionar Matéria';
+                }
+                if (el.id === 'modal-registro') { 
+                    DOM.formRegistro.reset(); 
+                    AppContext.editingRegistroId = null;
+                    DOM.modalRegistroTitle.textContent = 'Registro Manual';
+                }
+                if (el.id === 'modal-confirm') {
+                    AppContext.confirmActionCallback = null;
+                }
+            }
+        });
     },
 
     showConfirmModal(message, callback) {
@@ -493,11 +519,23 @@ const Views = {
         });
 
         if (slotsDeHoje.length === 0) {
-            DOM.containerHojeSlots.innerHTML = `
-                <div class="empty-state-container card text-center full-width" style="margin:0;">
-                    <span class="material-symbols-outlined empty-icon">celebration</span>
-                    <p>Nenhuma sessão programada para hoje. Curta seu dia livre!</p>
-                </div>`;
+            if (Store.state.materias.length === 0) {
+                // Estado de Onboarding (Usuário ainda não alimentou o motor)
+                DOM.containerHojeSlots.innerHTML = `
+                    <div class="onboarding-wrapper" style="margin:0;">
+                        <span class="material-symbols-outlined empty-icon" style="color: var(--color-warning); opacity: 1;">event_busy</span>
+                        <h3 style="margin-top: 16px;">Cronograma Indisponível</h3>
+                        <p>A <strong>Sugar Mommy</strong> precisa das suas matérias e metas para conseguir gerar seu dia automaticamente.</p>
+                        <button class="btn btn-primary" onclick="Controllers.switchView('view-config')">Ir para Configurações</button>
+                    </div>`;
+            } else {
+                // Estado Normal de "Folga" (Usuário está em dia)
+                DOM.containerHojeSlots.innerHTML = `
+                    <div class="empty-state-container card text-center full-width" style="margin:0;">
+                        <span class="material-symbols-outlined empty-icon">celebration</span>
+                        <p>Nenhuma sessão programada para hoje. Curta seu dia livre!</p>
+                    </div>`;
+            }
         } else {
             slotsDeHoje.forEach((slot, index) => {
                 let isDone = false;
@@ -573,6 +611,41 @@ const Views = {
     },
 
     renderDashboard() {
+        const dashboardGrid = document.querySelector('.dashboard-grid');
+        
+        // INTERVENÇÃO DE ONBOARDING: Se for a primeira vez do usuário, mostraremos o caminho
+        if (Store.state.materias.length === 0) {
+            dashboardGrid.classList.add('hidden');
+            
+            let onboardingEl = document.getElementById('dashboard-onboarding');
+            if (!onboardingEl) {
+                onboardingEl = document.createElement('div');
+                onboardingEl.id = 'dashboard-onboarding';
+                onboardingEl.className = 'onboarding-wrapper';
+                onboardingEl.innerHTML = `
+                    <span class="material-symbols-outlined empty-icon" style="font-size: 64px; color: var(--color-primary); opacity: 1; margin-bottom: 16px;">rocket_launch</span>
+                    <h3>Bem-vindo ao Sugar Mommy Planner!</h3>
+                    <p>Sua inteligência artificial particular para os estudos. Notei que seu plano ainda não foi configurado. Vamos dar o primeiro passo?</p>
+                    <div class="onboarding-actions">
+                        <button class="btn btn-primary btn-min-w" onclick="Controllers.switchView('view-config')">
+                            <span class="material-symbols-outlined">settings</span> 1. Configurar Minha Rotina
+                        </button>
+                        <button class="btn btn-secondary btn-min-w" onclick="Controllers.switchView('view-plan')">
+                            <span class="material-symbols-outlined">add</span> 2. Adicionar Matérias
+                        </button>
+                    </div>
+                `;
+                dashboardGrid.parentNode.insertBefore(onboardingEl, dashboardGrid);
+            } else {
+                onboardingEl.classList.remove('hidden');
+            }
+            return; // Interrompe os gráficos pois não há dados
+        } else {
+            dashboardGrid.classList.remove('hidden');
+            const existingOnboarding = document.getElementById('dashboard-onboarding');
+            if (existingOnboarding) existingOnboarding.classList.add('hidden');
+        }
+
         const stats = Logic.getEstatisticasMaterias();
         const classificacao = Logic.classificarFila();
         
@@ -947,19 +1020,47 @@ const Controllers = {
     },
 
     switchView(targetViewId) {
-        DOM.modais.forEach(modal => Utils.closeModal(modal));
+        DOM.modais.forEach(modal => { if (!modal.classList.contains('hidden')) Utils.closeModal(modal); });
 
-        DOM.views.forEach(view => view.classList.add('hidden'));
+        const currentView = document.querySelector('.view:not(.hidden)');
         const targetView = document.getElementById(targetViewId);
-        if (targetView) targetView.classList.remove('hidden');
+        
+        if (currentView === targetView) return;
 
-        // Controle de Visibilidade dos Botões Flutuantes (Mobile)
-        const fabMateria = document.getElementById('fab-add-materia');
-        const fabRegistro = document.getElementById('fab-add-registro');
-        if (fabMateria) fabMateria.classList.toggle('hidden', targetViewId !== 'view-plan');
-        if (fabRegistro) fabRegistro.classList.toggle('hidden', targetViewId !== 'view-diary');
+        // Linha do tempo GSAP para suavizar a saída da tela velha e entrada da nova
+        const timeline = gsap.timeline();
 
-        Views.renderAll();
+        if (currentView) {
+            timeline.to(currentView, {
+                opacity: 0, y: -10, duration: 0.2, ease: "power2.in",
+                onComplete: () => currentView.classList.add('hidden')
+            });
+        }
+
+        timeline.call(() => {
+            if (targetView) targetView.classList.remove('hidden');
+            
+            // Controle dos Botões Flutuantes (Mobile) com Efeito "Pop"
+            const fabMateria = document.getElementById('fab-add-materia');
+            const fabRegistro = document.getElementById('fab-add-registro');
+            if (fabMateria) {
+                fabMateria.classList.toggle('hidden', targetViewId !== 'view-plan');
+                if (targetViewId === 'view-plan') gsap.fromTo(fabMateria, { scale: 0 }, { scale: 1, duration: 0.4, ease: "back.out(1.7)" });
+            }
+            if (fabRegistro) {
+                fabRegistro.classList.toggle('hidden', targetViewId !== 'view-diary');
+                if (targetViewId === 'view-diary') gsap.fromTo(fabRegistro, { scale: 0 }, { scale: 1, duration: 0.4, ease: "back.out(1.7)" });
+            }
+
+            Views.renderAll();
+        });
+
+        if (targetView) {
+            timeline.fromTo(targetView, 
+                { opacity: 0, y: 15 }, 
+                { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
+            );
+        }
     },
 
     /* --- Handlers de Delegação de Eventos --- */
@@ -1022,7 +1123,7 @@ const Controllers = {
     },
 
     deleteMateria(id) {
-        Utils.showConfirmModal('Excluir esta matéria e tirá-la da fila de estudo permanentemente?', () => {
+        Utils.showConfirmModal('Excluir esta matéria e tirá-la da fila de estudos permanentemente?', () => {
             Store.state.materias = Store.state.materias.filter(m => m.id !== id);
             Store.save();
             Views.renderAll();
