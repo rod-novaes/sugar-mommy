@@ -492,6 +492,12 @@ tr:last-child td { border-bottom: none; }
     .drag-handle:hover { color: var(--color-primary); }
     .btn-close:hover { color: var(--color-danger); }
     .empty-state-container:hover { background-color: #F1F5F9; border-color: #94A3B8; }
+    
+    /* Efeito de destaque universal para as linhas da tabela no Desktop */
+    tr:not(.empty-state, .row-cut-off):hover { 
+        filter: brightness(0.96); 
+        transition: filter 0.15s ease;
+    }
     tr:not(.empty-state, .row-cut-off):hover td { background-color: #F8FAFC; }
 }
 
@@ -505,6 +511,23 @@ tr:last-child td { border-bottom: none; }
     #main-content { padding: 24px; }
     .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
     .full-width { grid-column: span 2; }
+    
+    /* Ergonomia Touch: Esconde a coluna de "Ações" com ícones pequenos */
+    #tabela-materias th:last-child, #tabela-materias td:last-child,
+    #tabela-historico th:last-child, #tabela-historico td:last-child {
+        display: none;
+    }
+    
+    /* Feedback Físico de Clique nas linhas da Tabela */
+    tr:not(.empty-state, .row-cut-off) { 
+        cursor: pointer;
+        transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    
+    tr:not(.empty-state, .row-cut-off):active {
+        transform: scale(0.99);
+        filter: brightness(0.95);
+    }
 }
 
 

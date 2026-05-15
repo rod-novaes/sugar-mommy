@@ -1093,8 +1093,8 @@ const Controllers = {
 
     /* --- Handlers de Delegação de Eventos --- */
     handleTableActions(e) {
-        // Habilidade Mobile: Clique no cartão inteiro para Editar
-        if (window.innerWidth <= 768) {
+        // Habilidade Touch (Mobile e Tablet): Clique na linha inteira para Editar
+        if (window.innerWidth <= 1024) {
             const trMateria = e.target.closest('#tabela-materias tr[data-id]');
             const isDragHandle = e.target.closest('.drag-handle');
             if (trMateria && !isDragHandle) {
