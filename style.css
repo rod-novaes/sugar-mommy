@@ -280,7 +280,7 @@ tr:last-child td { border-bottom: none; }
 .table-progress-bg { width: 100%; height: 6px; background-color: rgba(0, 0, 0, 0.08); border-radius: 3px; overflow: hidden; margin-top: 4px; }
 .table-progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 
-.drag-handle { cursor: grab; color: #94A3B8; text-align: center; vertical-align: middle; transition: color 0.2s; touch-action: none; /* Previne rolagem ao tentar arrastar no mobile */ }
+.drag-handle { cursor: grab; color: #94A3B8; text-align: center; vertical-align: middle; transition: color 0.2s; touch-action: none; }
 .drag-handle:active { cursor: grabbing; }
 
 /* O "Fantasma" (Espaço vazio indicando onde o card vai cair) */
@@ -290,7 +290,7 @@ tr:last-child td { border-bottom: none; }
     border: 2px dashed #94A3B8 !important; 
     box-shadow: none !important; 
 }
-.sortable-ghost td { opacity: 0 !important; } /* Esconde o texto/ícones do fantasma */
+.sortable-ghost td { opacity: 0 !important; }
 
 /* O Card flutuando no dedo do usuário (Efeito Elevado, Reto e Focado) */
 .sortable-drag, .sortable-fallback { 
@@ -301,9 +301,9 @@ tr:last-child td { border-bottom: none; }
 }
 
 /* Feedback Visual das Filas (Background dinâmico e marcante) */
-.row-active, .row-active td { background-color: #DBEAFE !important; --border-color: #93C5FD; } /* Azul Gelo com linha divisória Azul Escura */
-.row-waitlist, .row-waitlist td { background-color: #E2E8F0 !important; color: #475569; --border-color: #CBD5E1; } /* Cinza Asfalto com linha divisória Cinza Escura */
-.row-completed, .row-completed td { background-color: #D1FAE5 !important; opacity: 1; --border-color: #6EE7B7; } /* Verde Menta com linha divisória Verde Escura */
+.row-active, .row-active td { background-color: #DBEAFE !important; --border-color: #93C5FD; } /* Azul Gelo */
+.row-waitlist, .row-waitlist td { background-color: #E2E8F0 !important; color: #475569; --border-color: #CBD5E1; } /* Cinza Asfalto */
+.row-completed, .row-completed td { background-color: #D1FAE5 !important; opacity: 1; --border-color: #6EE7B7; } /* Verde Menta */
 
 .row-cut-off td { background: transparent; border: none; padding: 32px 8px 16px 8px; }
 .cut-off-divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
@@ -346,35 +346,151 @@ tr:last-child td { border-bottom: none; }
 .progress-wrapper { width: 100%; }
 .chart-wrapper { position: relative; width: 100%; min-height: 300px; }
 
-/* --- 3.6 CRONOGRAMA --- */
-.slots-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
-.slot-card { padding: 20px; border-radius: var(--radius-lg); border: 2px solid transparent; display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); position: relative; user-select: none; }
-.slot-card:active { transform: translateY(0); }
-.slot-header { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.slot-title { font-size: 18px; font-weight: 700; margin-top: 4px; }
-.slot-action-btn { position: absolute; bottom: 20px; right: 20px; width: 32px; height: 32px; border-radius: 50%; background-color: rgba(255, 255, 255, 0.5); display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+/* --- 3.6 CRONOGRAMA (KANBAN BOARD) --- */
+.week-nav-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.week-label-container {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-main);
+    min-width: 140px;
+    text-align: center;
+}
 
-.slot-teoria { background-color: var(--slot-teoria-bg); border-color: var(--slot-teoria-border); color: var(--slot-teoria-text); }
-.slot-questoes { background-color: var(--slot-questoes-bg); border-color: var(--slot-questoes-border); color: var(--slot-questoes-text); }
-.slot-manutencao { background-color: var(--slot-manutencao-bg); border-color: var(--slot-manutencao-border); color: var(--slot-manutencao-text); }
+.kanban-board {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 16px;
+    align-items: flex-start;
+}
 
-.slot-done { opacity: 0.6; border-style: dashed; cursor: default; background-color: #F8FAFC; border-color: #CBD5E1; color: #64748B; }
-.slot-done .slot-action-btn { background-color: var(--color-success); color: white; opacity: 1; }
+.kanban-column {
+    flex: 1;
+    min-width: 220px;
+    background-color: #F1F5F9;
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
 
-.timeline-container { display: flex; flex-direction: column; gap: 0; background: var(--bg-surface); padding: 24px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
-.timeline-item { display: flex; gap: 24px; position: relative; padding-bottom: 24px; }
-.timeline-item:last-child { padding-bottom: 0; }
-.timeline-date { width: 100px; flex-shrink: 0; text-align: right; }
-.timeline-date strong { display: block; font-size: 14px; color: var(--text-main); }
-.timeline-date small { color: var(--text-muted); font-size: 12px; }
-.timeline-marker { position: relative; display: flex; flex-direction: column; align-items: center; }
-.timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: #CBD5E1; border: 2px solid #fff; z-index: 2; box-shadow: 0 0 0 2px var(--bg-surface); }
-.timeline-item.is-today .timeline-dot { background: var(--color-primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.2); }
-.timeline-line { width: 2px; background: #E2E8F0; position: absolute; top: 12px; bottom: -24px; left: 5px; z-index: 1; }
-.timeline-item:last-child .timeline-line { display: none; }
-.timeline-content { flex: 1; padding-top: -2px; }
-.timeline-title { font-size: 13px; font-weight: 600; text-transform: capitalize; color: var(--text-muted); margin-bottom: 8px; display: block; }
-.timeline-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.kanban-column.is-today {
+    background-color: var(--bg-surface);
+    border: 2px solid var(--color-primary);
+    box-shadow: var(--shadow-sm);
+}
+.kanban-column.is-today .kanban-header-day { color: var(--color-primary); }
+
+.kanban-column.is-past {
+    opacity: 0.6;
+}
+
+.kanban-column.is-future {
+    opacity: 0.7;
+    filter: grayscale(0.5); /* Tira a vibração das cores de dias que não chegaram */
+}
+
+.kanban-column.is-disabled {
+    opacity: 0.4;
+    background-color: transparent;
+    border: 1px dashed var(--border-color);
+}
+
+.kanban-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+.kanban-header-day { font-size: 15px; font-weight: 700; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; }
+.kanban-header-date { font-size: 12px; color: var(--text-muted); }
+
+/* Cartões de Sessão do Kanban */
+.kanban-card {
+    border-radius: var(--radius-md);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s, filter 0.2s;
+}
+
+.kanban-card.type-teoria { background-color: var(--slot-teoria-bg); border: 1px solid var(--slot-teoria-border); color: var(--slot-teoria-text); }
+.kanban-card.type-questoes { background-color: var(--slot-questoes-bg); border: 1px solid var(--slot-questoes-border); color: var(--slot-questoes-text); }
+.kanban-card.type-manutencao { background-color: var(--slot-manutencao-bg); border: 1px solid var(--slot-manutencao-border); color: var(--slot-manutencao-text); }
+.kanban-card.type-descanso { background-color: var(--slot-descanso-bg); border: 1px dashed var(--border-color); color: var(--text-muted); text-align: center; }
+
+.kanban-card-title { font-size: 15px; font-weight: 700; line-height: 1.3; }
+.kanban-card-meta { font-size: 12px; font-weight: 600; text-transform: uppercase; opacity: 0.8; }
+
+/* Botão Base do Kanban */
+.btn-finish-session {
+    width: 100%;
+    color: var(--text-inverse);
+    border: none;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.btn-finish-session:hover { transform: translateY(-1px); }
+
+/* Cores Semânticas dos Botões de Ação */
+.kanban-card.type-teoria .btn-finish-session {
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+}
+.kanban-card.type-teoria .btn-finish-session:hover {
+    background-color: var(--color-primary-hover);
+    box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+}
+
+.kanban-card.type-questoes .btn-finish-session {
+    background-color: #D97706; /* Laranja mais escuro */
+    box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+.kanban-card.type-questoes .btn-finish-session:hover {
+    background-color: #B45309; /* Hover ainda mais escuro */
+    box-shadow: 0 4px 6px rgba(217, 119, 6, 0.3);
+}
+
+.kanban-card.type-manutencao .btn-finish-session {
+    background-color: #059669; /* Verde mais escuro */
+    box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+}
+.kanban-card.type-manutencao .btn-finish-session:hover {
+    background-color: #047857; /* Hover ainda mais escuro */
+    box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+}
+
+/* Estado de Sessão Concluída (Sobrescreve as cores) */
+.kanban-card.is-done {
+    filter: grayscale(1);
+    opacity: 0.6;
+}
+.kanban-card.is-done .btn-finish-session {
+    background-color: #E2E8F0 !important;
+    color: var(--text-muted) !important;
+    box-shadow: none !important;
+    pointer-events: auto;
+}
+.kanban-card.is-done .btn-finish-session:hover { transform: none; background-color: #CBD5E1 !important; }
+
+/* Mini Barra de Progresso no Cartão do Kanban */
+.kanban-progress-wrapper {
+    width: 100%; height: 6px; background-color: rgba(0,0,0,0.08);
+    border-radius: 3px; overflow: hidden; margin-top: 4px;
+}
+.kanban-progress-fill {
+    height: 100%; border-radius: 3px; transition: width 0.4s ease; background-color: currentColor;
+}
 
 /* --- 3.7 WIZARD DE CONFIGURAÇÕES --- */
 .stepper { display: flex; align-items: center; justify-content: space-between; }
@@ -487,9 +603,6 @@ tr:last-child td { border-bottom: none; }
     .btn-danger:hover { background-color: #B91C1C; }
     .nav-item:hover { background-color: var(--bg-sidebar-hover); color: var(--text-inverse); }
     .btn-page:hover:not(:disabled) { background-color: #F1F5F9; color: var(--color-primary); border-color: #CBD5E1; }
-    .slot-card:hover:not(.slot-done) { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-    .slot-card:hover .slot-action-btn { background-color: var(--bg-surface); box-shadow: var(--shadow-sm); transform: scale(1.1); }
-    .drag-handle:hover { color: var(--color-primary); }
     .btn-close:hover { color: var(--color-danger); }
     .empty-state-container:hover { background-color: #F1F5F9; border-color: #94A3B8; }
     
@@ -541,7 +654,7 @@ tr:last-child td { border-bottom: none; }
     body { overscroll-behavior-y: none; background-color: #F1F5F9; }
     #app-body { flex-direction: column; }
     
-    /* Espaço extra no fundo para não ser coberto pela Navigation Bar */
+    /* Espaço extra no fundo para não ser coberto pela Navigation Bar + Respiro visual */
     #main-content { padding: 16px 16px 140px 16px; overflow-x: hidden; }
 
     /* Header */
@@ -571,6 +684,51 @@ tr:last-child td { border-bottom: none; }
     .summary-card .metric { font-size: 32px; }
     .chart-card { min-height: auto; width: 100%; overflow: hidden; padding: 16px;}
     .chart-wrapper { width: 100%; min-width: 0; overflow-x: auto; }
+
+    /* Cronograma Kanban Mobile (Carrossel) */
+    .view-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .week-nav-controls { width: 100%; justify-content: space-between; }
+    .week-label-container { flex: 1; }
+    
+    .kanban-board {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding: 16px; /* Adicionado padding interno */
+    padding-bottom: 24px;
+    align-items: flex-start;
+    background-color: #F8FAFC; /* Fundo sutil para a área arrastável */
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-lg);
+    cursor: grab; /* Indica que a área pode ser puxada */
+    }
+    .kanban-board:active {
+        cursor: grabbing;
+    }
+
+    /* Barra de Rolagem Horizontal Customizada (Confortável e Moderna) */
+    .kanban-board::-webkit-scrollbar {
+        height: 12px; 
+    }
+    .kanban-board::-webkit-scrollbar-track {
+        background: transparent;
+        border-radius: 6px;
+        margin: 0 16px; /* Desgruda das bordas do card */
+    }
+    .kanban-board::-webkit-scrollbar-thumb {
+        background-color: #CBD5E1;
+        border-radius: 6px;
+        border: 3px solid #F8FAFC; /* Cria um "padding" falso na barra */
+    }
+    .kanban-board::-webkit-scrollbar-thumb:hover {
+        background-color: #94A3B8;
+    }
+    
+    .kanban-column {
+        scroll-snap-align: center; 
+        flex: 0 0 85%; 
+        min-width: 85%;
+    }
 
     /* Botões Flutuantes (FABs) e Ocultação Desktop */
     .desktop-btn { display: none; }
@@ -630,7 +788,7 @@ tr:last-child td { border-bottom: none; }
     
     /* Grip Zone perfeitamente integrada à cor do fundo */
     #tabela-materias td.drag-handle { 
-        grid-column: 1 / 2; grid-row: 1 / 4; 
+        grid-column: 1 / 2; grid-row: 1 / 3; 
         background: rgba(0, 0, 0, 0.05) !important; 
         border-right: 1px solid rgba(0, 0, 0, 0.05); 
         display: flex; align-items: center; justify-content: center;
@@ -691,7 +849,7 @@ tr:last-child td { border-bottom: none; }
     #tabela-historico td[data-label="Ações"],
     #tabela-historico td[data-label="Comentário"] { display: none !important; }
 
-    /* Paginação Redesenhada (Diário de Estudos) */
+    /* Paginação Redesenhada (Diário de Estudo) */
     .pagination-footer {
         flex-direction: column-reverse; /* Inverte a ordem: botões em cima, texto embaixo */
         gap: 16px;
@@ -716,14 +874,6 @@ tr:last-child td { border-bottom: none; }
     .pagination-info { width: 100%; text-align: center; }
     .select-page-size { display: none; } /* Esconde o Dropdown no celular */
     #diary-page-info { margin-left: 0; display: block; font-size: 12px; color: #94A3B8; }
-    
-    /* Timeline */
-    .slots-grid { grid-template-columns: 1fr; }
-    .timeline-item { flex-direction: column; gap: 8px; padding-left: 28px; padding-bottom: 32px; }
-    .timeline-date { width: auto; text-align: left; }
-    .timeline-marker { position: absolute; left: 0; top: 0; bottom: 0; align-items: flex-start; }
-    .timeline-line { left: 5px; top: 16px; bottom: -32px; }
-    .timeline-tags { gap: 4px; }
 
     /* Wizard Configurações */
     .form-row { flex-direction: column; gap: 16px; }

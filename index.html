@@ -151,36 +151,30 @@
 
                 <!-- ----------------------------------------------------------- -->
                 <!-- SEÇÃO 4.2: VIEW CRONOGRAMA -->
-                <!-- Interface passiva para o usuário apenas executar as sessões -->
+                <!-- O novo Kanban Board integrado com Linha do Tempo -->
                 <!-- ----------------------------------------------------------- -->
                 <section id="view-schedule" class="view hidden">
-                    <header class="view-header flex-between">
+                    <header class="view-header flex-between" style="flex-wrap: wrap; gap: 16px;">
                         <div>
                             <h2>Cronograma de Estudo</h2>
-                            <p class="subtitle">Sua fila inteligente. Apenas sente, cumpra o foco de hoje e marque como feito.</p>
+                            <p class="subtitle">Sua semana em um piscar de olhos. Clique nos cartões para realizar suas sessões.</p>
+                        </div>
+                        <div class="week-nav-controls">
+                            <button class="btn btn-secondary btn-icon" id="btn-prev-week" title="Semana Anterior">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                            <div class="week-label-container">
+                                <span id="week-label-text">Semana Atual</span>
+                            </div>
+                            <button class="btn btn-secondary btn-icon" id="btn-next-week" title="Próxima Semana">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
                         </div>
                     </header>
 
-                    <!-- Foco de Hoje -->
-                    <div class="schedule-today-section mb-3">
-                        <h3 class="section-title" id="lbl-dia-hoje">Foco de Hoje</h3>
-                        <div id="hoje-slots-container" class="slots-grid">
-                            <div class="empty-state-container card text-center full-width">
-                                <span class="material-symbols-outlined empty-icon">event_busy</span>
-                                <p>Gere seu cronograma nas configurações para ver o seu dia.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Visão da Semana -->
-                    <div class="schedule-week-section">
-                        <h3 class="section-title">Previsão da Semana Atual</h3>
-                        <div class="timeline-container" id="timeline-semana">
-                            <div class="empty-state-container text-center p-4">
-                                <span class="material-symbols-outlined empty-icon">calendar_today</span>
-                                <p>Cronograma ainda não gerado.</p>
-                            </div>
-                        </div>
+                    <!-- O Kanban Board (Carrossel no Mobile, Colunas no Desktop) -->
+                    <div class="kanban-board" id="kanban-board-container">
+                        <!-- O Javascript vai injetar as 7 colunas (Segunda a Domingo) aqui -->
                     </div>
                 </section>
 

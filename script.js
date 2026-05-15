@@ -51,7 +51,8 @@ const AppContext = {
     editingRegistroId: null,
     confirmActionCallback: null,
     chart7DiasInstance: null,
-    chartMateriasInstance: null
+    chartMateriasInstance: null,
+    weekOffset: 0 /* Controle de navegação do Kanban (0 = Atual, -1 = Passada, 1 = Próxima) */
 };
 
 /* ========================================================================== */
@@ -88,8 +89,12 @@ const DOM = {
     alertaMatriz: document.getElementById('alerta-matriz'),
     
     /* --- Áreas de Renderização --- */
-    containerHojeSlots: document.getElementById('hoje-slots-container'),
-    containerSemana: document.getElementById('timeline-semana'),
+    kanbanBoardContainer: document.getElementById('kanban-board-container'),
+    weekNavControls: document.querySelector('.week-nav-controls'),
+    btnPrevWeek: document.getElementById('btn-prev-week'),
+    btnNextWeek: document.getElementById('btn-next-week'),
+    weekLabelText: document.getElementById('week-label-text'),
+    
     listaMateriasDrag: document.getElementById('lista-materias-drag'),
     tabelaHistoricoBody: document.querySelector('#tabela-historico tbody'),
     
@@ -291,53 +296,86 @@ const Logic = {
         return matriz;
     },
 
-    gerarSessoesDoDia(dataString, classificacao, matrizAjustada) {
-        const daysMap = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sab'];
-        const diaDaSemana = daysMap[new Date(dataString + 'T00:00:00').getDay()];
-        const configDia = matrizAjustada[diaDaSemana];
+    projetarSemana(startOfWeekStr, classificacao, matrizAjustada, maxMaterias) {
+        let simStats = JSON.parse(JSON.stringify(classificacao.stats));
+        let materias = Store.state.materias;
+        let manuts = JSON.parse(JSON.stringify(classificacao.manutencao)).sort((a,b) => b.peso - a.peso);
+        
+        let plan = {}; 
+        let todayStr = Utils.getTodayStr();
+        
+        // Define o intervalo alvo da semana
+        let targetStart = new Date(startOfWeekStr + 'T00:00:00');
+        let targetEnd = new Date(startOfWeekStr + 'T00:00:00');
+        targetEnd.setDate(targetEnd.getDate() + 6);
 
-        let slotsGerados = [];
-        if (configDia.slots === 0 || configDia.tipo === 'descanso') return slotsGerados;
+        // O Motor 3.0 começa a simular a partir de HOJE ou do INÍCIO DA SEMANA ALVO (o que for mais antigo)
+        let todayObj = new Date(todayStr + 'T00:00:00');
+        let loopDate = new Date(Math.min(todayObj.getTime(), targetStart.getTime()));
+        
+        // Ponteiros baseados na data de início da simulação
+        let epochSimStart = Math.floor(loopDate.getTime() / 86400000);
+        let ptTeoria = epochSimStart * 10; 
+        let ptQuestoes = epochSimStart * 10; 
+        let ptManut = epochSimStart * 10;
 
-        const epochDays = Math.floor(new Date(dataString + 'T00:00:00').getTime() / 86400000);
+        // Roda a esteira de tempo até o último dia da semana que será exibida
+        while (loopDate <= targetEnd) {
+            let dStr = loopDate.toISOString().split('T')[0];
+            let diaDaSemana = ['dom','seg','ter','qua','qui','sex','sab'][loopDate.getDay()];
+            let configDia = matrizAjustada[diaDaSemana];
+            let slotsDoDia = [];
 
-        if (configDia.tipo === 'teoria') {
-            let ativasTeoria = classificacao.ativas.filter(m => classificacao.stats[m.id].teoriaFeita < Number(m.sessoes));
-            if (ativasTeoria.length > 0) {
-                let index = (epochDays * configDia.slots) % ativasTeoria.length;
-                for (let i = 0; i < configDia.slots; i++) {
-                    const mat = ativasTeoria[index % ativasTeoria.length];
-                    slotsGerados.push({ idMateria: mat.id, nome: mat.nome, tipo: 'teoria' });
-                    index++;
+            if (configDia && configDia.tipo !== 'descanso' && configDia.slots > 0) {
+                for(let s = 0; s < configDia.slots; s++) {
+                    
+                    let incompletas = materias.filter(m => {
+                        let st = simStats[m.id];
+                        let mT = Number(m.sessoes)||0; let mQ = Number(m.questoes)||0;
+                        return !( (mT>0 || mQ>0) && st.teoriaFeita >= mT && st.questoesFeitas >= mQ );
+                    });
+                    let ativas = incompletas.slice(0, maxMaterias);
+
+                    let matSelecionada = null;
+                    
+                    if (configDia.tipo === 'teoria') {
+                        let cand = ativas.filter(m => simStats[m.id].teoriaFeita < (Number(m.sessoes)||0));
+                        if(cand.length > 0) { matSelecionada = cand[ptTeoria % cand.length]; ptTeoria++; }
+                    } else if (configDia.tipo === 'questoes') {
+                        let cand = ativas.filter(m => simStats[m.id].questoesFeitas < (Number(m.questoes)||0));
+                        if(cand.length > 0) { matSelecionada = cand[ptQuestoes % cand.length]; ptQuestoes++; }
+                    } else if (configDia.tipo === 'manutencao') {
+                        if(manuts.length > 0) { matSelecionada = manuts[ptManut % manuts.length]; ptManut++; }
+                    }
+
+                    if (matSelecionada) {
+                        slotsDoDia.push({ 
+                            idMateria: matSelecionada.id, 
+                            nome: matSelecionada.nome, 
+                            tipo: configDia.tipo,
+                            progressoSimulado: JSON.parse(JSON.stringify(simStats[matSelecionada.id]))
+                        });
+                        
+                        // O SEGREDO: Só soma na simulação se o dia for Hoje ou Futuro. 
+                        // O Passado não é simulado porque a realidade (o banco de dados) já computou o que aconteceu.
+                        if (dStr >= todayStr) {
+                            if(configDia.tipo === 'teoria') simStats[matSelecionada.id].teoriaFeita++;
+                            if(configDia.tipo === 'questoes') simStats[matSelecionada.id].questoesFeitas++;
+                            if(configDia.tipo === 'manutencao') simStats[matSelecionada.id].manutencaoFeita++;
+                        }
+                    }
                 }
             }
-        }
-
-        if (configDia.tipo === 'questoes') {
-            let ativasQuestoes = classificacao.ativas.filter(m => classificacao.stats[m.id].questoesFeitas < Number(m.questoes));
-            if (ativasQuestoes.length > 0) {
-                let index = (epochDays * configDia.slots) % ativasQuestoes.length;
-                for (let i = 0; i < configDia.slots; i++) {
-                    const mat = ativasQuestoes[index % ativasQuestoes.length];
-                    slotsGerados.push({ idMateria: mat.id, nome: mat.nome, tipo: 'questoes' });
-                    index++;
-                }
+            
+            // Só guarda o slot gerado na memória se o dia pertencer à semana que o usuário pediu para ver
+            if (loopDate >= targetStart && loopDate <= targetEnd) {
+                plan[dStr] = slotsDoDia;
             }
+            
+            loopDate.setDate(loopDate.getDate() + 1); // Avança 1 dia
         }
-
-        if (configDia.tipo === 'manutencao') {
-            if (classificacao.manutencao.length > 0) {
-                let manuts = [...classificacao.manutencao].sort((a, b) => Number(b.peso) - Number(a.peso));
-                let index = (epochDays * configDia.slots) % manuts.length;
-                for (let i = 0; i < configDia.slots; i++) {
-                    const mat = manuts[index % manuts.length];
-                    slotsGerados.push({ idMateria: mat.id, nome: mat.nome, tipo: 'manutencao' });
-                    index++;
-                }
-            }
-        }
-
-        return slotsGerados;
+        
+        return plan;
     }
 };
 
@@ -503,112 +541,173 @@ const Views = {
     },
 
     renderSchedule() {
-        const hojeStr = Utils.getTodayStr();
+        const kanbanContainer = DOM.kanbanBoardContainer;
+        if (!kanbanContainer) return;
+
+        kanbanContainer.innerHTML = '';
+
+        // Intervenção de Onboarding: Se não há matérias, esconde o Kanban e os controles
+        if (Store.state.materias.length === 0) {
+            kanbanContainer.innerHTML = `
+                <div class="onboarding-wrapper" style="margin: 16px auto; max-width: 500px;">
+                    <span class="material-symbols-outlined empty-icon" style="color: var(--color-warning); opacity: 1;">event_busy</span>
+                    <h3 style="margin-top: 16px;">Cronograma Indisponível</h3>
+                    <p>A <strong>assistente particular para os estudos</strong> precisa das suas matérias e metas para conseguir gerar sua semana automaticamente.</p>
+                    <button class="btn btn-primary" onclick="Controllers.switchView('view-config')">Ir para Configurações</button>
+                </div>`;
+            if (DOM.weekNavControls) DOM.weekNavControls.classList.add('hidden');
+            return;
+        } else {
+            if (DOM.weekNavControls) DOM.weekNavControls.classList.remove('hidden');
+        }
+
         const classificacao = Logic.classificarFila();
         const matrizAjustada = Logic.getMatrizAjustada(classificacao.manutencao);
 
-        // Renderiza Slots de Hoje
-        DOM.containerHojeSlots.innerHTML = '';
+        // Lógica de Calendário Fixo: Encontrar a Segunda-feira base e aplicar o Offset
+        const hojeObj = new Date(Utils.getTodayStr() + 'T00:00:00');
+        const diaDaSemanaHoje = hojeObj.getDay(); 
+        const diffParaSegunda = diaDaSemanaHoje === 0 ? -6 : 1 - diaDaSemanaHoje; 
         
-        const slotsDeHoje = Logic.gerarSessoesDoDia(hojeStr, classificacao, matrizAjustada);
-        const feitosHoje = Store.state.registros.filter(r => r.data === hojeStr);
-        
-        let slotsConsumidos = { teoria: {}, questoes: {}, manutencao: {} };
-        feitosHoje.forEach(r => {
-            let t = r.tipo === 'sessoes' ? 'teoria' : r.tipo; 
-            if (!slotsConsumidos[t][r.idMateria]) slotsConsumidos[t][r.idMateria] = 0;
-            slotsConsumidos[t][r.idMateria] += Number(r.quantidade);
-        });
+        const segundaFeiraAtual = new Date(hojeObj);
+        segundaFeiraAtual.setDate(hojeObj.getDate() + diffParaSegunda);
 
-        if (slotsDeHoje.length === 0) {
-            if (Store.state.materias.length === 0) {
-                // Estado de Onboarding (Usuário ainda não alimentou o motor)
-                DOM.containerHojeSlots.innerHTML = `
-                    <div class="onboarding-wrapper" style="margin:0;">
-                        <span class="material-symbols-outlined empty-icon" style="color: var(--color-warning); opacity: 1;">event_busy</span>
-                        <h3 style="margin-top: 16px;">Cronograma Indisponível</h3>
-                        <p>A <strong>Sugar Mommy</strong> precisa das suas matérias e metas para conseguir gerar seu dia automaticamente.</p>
-                        <button class="btn btn-primary" onclick="Controllers.switchView('view-config')">Ir para Configurações</button>
-                    </div>`;
-            } else {
-                // Estado Normal de "Folga" (Usuário está em dia)
-                DOM.containerHojeSlots.innerHTML = `
-                    <div class="empty-state-container card text-center full-width" style="margin:0;">
-                        <span class="material-symbols-outlined empty-icon">celebration</span>
-                        <p>Nenhuma sessão programada para hoje. Curta seu dia livre!</p>
-                    </div>`;
+        const startOfWeek = new Date(segundaFeiraAtual);
+        startOfWeek.setDate(segundaFeiraAtual.getDate() + (AppContext.weekOffset * 7));
+
+        if (DOM.weekLabelText) {
+            if (AppContext.weekOffset === 0) DOM.weekLabelText.textContent = "Semana Atual";
+            else if (AppContext.weekOffset === -1) DOM.weekLabelText.textContent = "Semana Passada";
+            else if (AppContext.weekOffset === 1) DOM.weekLabelText.textContent = "Próxima Semana";
+            else {
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+                const format = (d) => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                DOM.weekLabelText.textContent = `${format(startOfWeek)} a ${format(endOfWeek)}`;
             }
-        } else {
-            slotsDeHoje.forEach((slot, index) => {
-                let isDone = false;
-                if (slotsConsumidos[slot.tipo] && slotsConsumidos[slot.tipo][slot.idMateria] > 0) {
-                    isDone = true;
-                    slotsConsumidos[slot.tipo][slot.idMateria] -= 1;
-                }
-
-                const card = document.createElement('div');
-                card.className = `slot-card slot-${slot.tipo} ${isDone ? 'slot-done' : ''}`;
-                if (!isDone) card.dataset.slotData = JSON.stringify({ ...slot, index });
-                
-                const txtTipo = slot.tipo === 'teoria' ? 'Sessão de Teoria' : slot.tipo === 'questoes' ? 'Sessão de Questões' : 'Sessão de Revisão';
-                const iconBtn = isDone ? 'check' : 'play_arrow';
-                
-                card.innerHTML = `
-                    <div class="slot-header">
-                        <span>Sessão ${index + 1}</span>
-                        <span>${txtTipo}</span>
-                    </div>
-                    <div class="slot-title">${slot.nome}</div>
-                    <div class="slot-action-btn" title="${isDone ? 'Concluído' : 'Marcar como Feito'}">
-                        <span class="material-symbols-outlined">${iconBtn}</span>
-                    </div>
-                `;
-
-                DOM.containerHojeSlots.appendChild(card);
-            });
         }
 
-        // Renderiza Timeline da Semana
-        if (DOM.containerSemana) {
-            DOM.containerSemana.innerHTML = '';
-            const dateCursor = new Date(hojeStr + 'T00:00:00');
+        const diasSemanaNomes = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+        const startOfWeekStr = startOfWeek.toISOString().split('T')[0];
+        
+        // Simulação Dinâmica da Semana (O Motor 2.0 entra em ação)
+        const projecaoSemana = Logic.projetarSemana(startOfWeekStr, classificacao, matrizAjustada, Store.state.config.maxMaterias);
+
+        for (let i = 0; i < 7; i++) {
+            const currentDayObj = new Date(startOfWeek);
+            currentDayObj.setDate(startOfWeek.getDate() + i);
+            const dataStr = currentDayObj.toISOString().split('T')[0];
+            const dataDisplay = currentDayObj.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+            const todayStr = Utils.getTodayStr();
+            const isToday = dataStr === todayStr;
+            const isPast = dataStr < todayStr;
             
-            for (let i = 0; i < 7; i++) {
-                const dStr = dateCursor.toISOString().split('T')[0];
-                const displayData = dStr.split('-').reverse().join('/');
+            const planStart = Store.state.config.dataInicio;
+            const planEnd = Store.state.config.dataFim;
+            const isOutOfBounds = (planStart && dataStr < planStart) || (planEnd && dataStr > planEnd);
+
+            let colClasses = 'kanban-column';
+            if (isOutOfBounds) colClasses += ' is-disabled';
+            else if (isPast) colClasses += ' is-past';
+            else if (AppContext.weekOffset > 0) colClasses += ' is-future';
+            
+            if (isToday) colClasses += ' is-today';
+
+            const colEl = document.createElement('div');
+            colEl.className = colClasses;
+
+            let colHtml = `
+                <div class="kanban-header">
+                    <span class="kanban-header-day">${diasSemanaNomes[i]}</span>
+                    <span class="kanban-header-date">${isToday ? 'HOJE - ' : ''}${dataDisplay}</span>
+                </div>
+            `;
+
+            if (isOutOfBounds) {
+                colHtml += `<div class="text-center text-muted text-sm mt-3" style="font-weight: 500;">Fora do período do plano.</div>`;
+            } else {
+                const slotsProg = projecaoSemana[dataStr] || [];
+                const feitosNesteDia = Store.state.registros.filter(r => r.data === dataStr);
                 
-                const daysMap = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
-                const nomeDia = daysMap[dateCursor.getDay()];
-                const isToday = i === 0;
-                
-                const slotsProg = Logic.gerarSessoesDoDia(dStr, classificacao, matrizAjustada);
-                const configRaw = matrizAjustada[['dom','seg','ter','qua','qui','sex','sab'][dateCursor.getDay()]];
-                
-                let displayTipo = configRaw.tipo === 'manutencao' ? 'revisão' : configRaw.tipo;
-                let visualFila = slotsProg.length === 0 ? '<span class="text-sm text-muted">Nenhuma sessão programada.</span>' : '';
-                
-                slotsProg.forEach(s => {
-                    visualFila += `<span class="tag-atividade tag-${s.tipo}" title="${s.nome}">${s.nome.substring(0, 18)}${s.nome.length > 18 ? '...' : ''}</span>`;
+                let slotsConsumidos = { teoria: {}, questoes: {}, manutencao: {} };
+                feitosNesteDia.forEach(r => {
+                    let t = r.tipo === 'sessoes' ? 'teoria' : r.tipo; 
+                    if (!slotsConsumidos[t][r.idMateria]) slotsConsumidos[t][r.idMateria] = { count: 0, ids: [] };
+                    slotsConsumidos[t][r.idMateria].count += Number(r.quantidade);
+                    slotsConsumidos[t][r.idMateria].ids.push(r.id); 
                 });
 
-                DOM.containerSemana.innerHTML += `
-                    <div class="timeline-item ${isToday ? 'is-today' : ''}">
-                        <div class="timeline-date">
-                            <strong>${nomeDia}</strong>
-                            <small>${isToday ? 'Hoje' : displayData}</small>
-                        </div>
-                        <div class="timeline-marker">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-line"></div>
-                        </div>
-                        <div class="timeline-content">
-                            <span class="timeline-title">${displayTipo} (${configRaw.slots} sessões)</span>
-                            <div class="timeline-tags">${visualFila}</div>
-                        </div>
-                    </div>
-                `;
-                dateCursor.setDate(dateCursor.getDate() + 1);
+                if (slotsProg.length === 0) {
+                    const tipoDia = Store.state.config.matrizSemanal[['seg','ter','qua','qui','sex','sab','dom'][i]].tipo;
+                    if(tipoDia === 'descanso') {
+                        colHtml += `<div class="kanban-card type-descanso"><span class="kanban-card-title">Descanso</span></div>`;
+                    } else {
+                        colHtml += `<div class="text-center text-muted text-sm mt-3">Sem metas para hoje.</div>`;
+                    }
+                } else {
+                    slotsProg.forEach((slot) => {
+                        let isDone = false;
+                        let registroId = null;
+                        
+                        if (slotsConsumidos[slot.tipo] && slotsConsumidos[slot.tipo][slot.idMateria] && slotsConsumidos[slot.tipo][slot.idMateria].count > 0) {
+                            isDone = true;
+                            slotsConsumidos[slot.tipo][slot.idMateria].count -= 1;
+                            registroId = slotsConsumidos[slot.tipo][slot.idMateria].ids.pop();
+                        }
+
+                        // Cálculo do Efeito Gradiente usando a Estatística Simulada exata deste slot!
+                        const mat = Store.state.materias.find(m => m.id === slot.idMateria);
+                        const st = slot.progressoSimulado; 
+                        let metaTotal = 0; let feita = 0;
+                        
+                        if (slot.tipo === 'teoria') { metaTotal = Number(mat?.sessoes || 0); feita = st.teoriaFeita; }
+                        else if (slot.tipo === 'questoes') { metaTotal = Number(mat?.questoes || 0); feita = st.questoesFeitas; }
+
+                        let percentual = 0;
+                        if (metaTotal > 0) percentual = Math.min((feita / metaTotal) * 100, 100);
+                        else if (slot.tipo === 'manutencao') percentual = 100;
+
+                        const txtTipo = slot.tipo === 'teoria' ? 'Teoria' : slot.tipo === 'questoes' ? 'Questões' : 'Revisão';
+                        const payload = { ...slot, dataStr, registroId };
+
+                        let buttonHtml = '';
+                        if (isToday) {
+                            buttonHtml = `<button class="btn btn-finish-session kanban-action-btn" data-payload='${JSON.stringify(payload)}' data-action="${isDone ? 'undo' : 'do'}">${isDone ? 'Desfazer Conclusão' : 'Finalizar Sessão'}</button>`;
+                        } else if (isPast) {
+                            buttonHtml = `<div class="text-center text-sm" style="font-weight: 600; padding: 8px; border-radius: 4px; background: rgba(0,0,0,0.05);">${isDone ? 'Concluído' : 'Pendente'}</div>`;
+                        } else {
+                            buttonHtml = `<div class="text-center text-sm text-muted">Sessão Programada</div>`;
+                        }
+
+                        colHtml += `
+                            <div class="kanban-card type-${slot.tipo} ${isDone ? 'is-done' : ''}">
+                                <div class="kanban-card-meta flex-between">
+                                    <span>${txtTipo}</span>
+                                </div>
+                                <div class="kanban-card-title">${slot.nome}</div>
+                                <div class="kanban-progress-wrapper" title="${Math.floor(percentual)}% Concluído">
+                                    <div class="kanban-progress-fill" style="width: ${percentual}%;"></div>
+                                </div>
+                                ${buttonHtml}
+                            </div>
+                        `;
+                    });
+                }
             }
+
+            colEl.innerHTML = colHtml;
+            kanbanContainer.appendChild(colEl);
+        }
+
+        // Auto-Scroll Mobile corrigido para não entrar em conflito com o Snap
+        if (window.innerWidth <= 768 && AppContext.weekOffset === 0) {
+            setTimeout(() => {
+                const todayCol = kanbanContainer.querySelector('.kanban-column.is-today');
+                if (todayCol) {
+                    kanbanContainer.scrollTo({ left: todayCol.offsetLeft - 16, behavior: 'smooth' });
+                }
+            }, 100);
         }
     },
 
@@ -641,7 +740,7 @@ const Views = {
             } else {
                 onboardingEl.classList.remove('hidden');
             }
-            return; // Interrompe os gráficos pois não há dados
+            return; 
         } else {
             dashboardGrid.classList.remove('hidden');
             const existingOnboarding = document.getElementById('dashboard-onboarding');
@@ -1025,8 +1124,43 @@ const Controllers = {
         DOM.listaMateriasDrag?.addEventListener('click', this.handleTableActions.bind(this));
         DOM.tabelaHistoricoBody?.addEventListener('click', this.handleTableActions.bind(this));
 
-        // Event Delegation (Cronograma)
-        DOM.containerHojeSlots?.addEventListener('click', this.handleScheduleAction.bind(this));
+        // Event Delegation (Cronograma Kanban)
+        DOM.kanbanBoardContainer?.addEventListener('click', this.handleKanbanAction.bind(this));
+
+        // Controles de Navegação da Semana (Kanban)
+        DOM.btnPrevWeek?.addEventListener('click', () => {
+            AppContext.weekOffset -= 1;
+            Views.renderSchedule();
+        });
+        DOM.btnNextWeek?.addEventListener('click', () => {
+            AppContext.weekOffset += 1;
+            Views.renderSchedule();
+        });
+
+        // "Drag to Scroll" (Arrastar para rolar no Desktop)
+        const kanbanBoard = DOM.kanbanBoardContainer;
+        if (kanbanBoard) {
+            let isDown = false;
+            let startX;
+            let scrollLeft;
+
+            kanbanBoard.addEventListener('mousedown', (e) => {
+                // Evita conflito ao clicar nos botões dos cartões
+                if (e.target.closest('.btn-finish-session')) return;
+                isDown = true;
+                startX = e.pageX - kanbanBoard.offsetLeft;
+                scrollLeft = kanbanBoard.scrollLeft;
+            });
+            kanbanBoard.addEventListener('mouseleave', () => { isDown = false; });
+            kanbanBoard.addEventListener('mouseup', () => { isDown = false; });
+            kanbanBoard.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - kanbanBoard.offsetLeft;
+                const walk = (x - startX) * 2; // Multiplicador de velocidade
+                kanbanBoard.scrollLeft = scrollLeft - walk;
+            });
+        }
 
         // Formulários
         DOM.formConfig?.addEventListener('input', this.handleConfigInput.bind(this));
@@ -1125,30 +1259,41 @@ const Controllers = {
         }
     },
 
-    handleScheduleAction(e) {
-        const card = e.target.closest('.slot-card');
-        if (!card || card.classList.contains('slot-done')) return;
-        
-        const slotData = card.dataset.slotData ? JSON.parse(card.dataset.slotData) : null;
-        if (!slotData) return;
+    handleKanbanAction(e) {
+        const btn = e.target.closest('.kanban-action-btn');
+        if (!btn) return;
 
-        Utils.showConfirmModal(`Confirmar a conclusão da sessão de ${slotData.nome}?`, () => {
-            card.classList.add('anim-success');
-            setTimeout(() => {
-                const novoReg = {
-                    id: Date.now().toString(),
-                    data: Utils.getTodayStr(),
-                    idMateria: slotData.idMateria,
-                    tipo: slotData.tipo,
-                    quantidade: 1,
-                    comentario: 'Feito pelo Cronograma'
-                };
-                Store.state.registros.push(novoReg);
-                Store.save();
-                Views.renderAll();
-                Utils.showToast(`Mandou bem! Sessão de ${slotData.nome} concluída.`, 'success');
-            }, 500);
-        });
+        const payload = JSON.parse(btn.dataset.payload);
+        const action = btn.dataset.action;
+        const card = btn.closest('.kanban-card');
+
+        if (action === 'do') {
+            Utils.showConfirmModal(`Finalizar a sessão de ${payload.nome}?`, () => {
+                card.classList.add('anim-success');
+                setTimeout(() => {
+                    const novoReg = {
+                        id: Date.now().toString(),
+                        data: payload.dataStr, 
+                        idMateria: payload.idMateria,
+                        tipo: payload.tipo,
+                        quantidade: 1,
+                        comentario: 'Feito pelo Cronograma'
+                    };
+                    Store.state.registros.push(novoReg);
+                    Store.save();
+                    Views.renderAll();
+                    Utils.showToast(`Sessão concluída!`, 'success');
+                }, 500);
+            });
+        } else if (action === 'undo') {
+            if (payload.registroId) {
+                Utils.showConfirmModal(`Desfazer a conclusão desta sessão?`, () => {
+                    Store.state.registros = Store.state.registros.filter(r => r.id !== payload.registroId);
+                    Store.save();
+                    Views.renderAll();
+                });
+            }
+        }
     },
 
     /* --- Handlers de Ações Específicas --- */
