@@ -1352,11 +1352,18 @@ document.addEventListener('DOMContentLoaded', () => {
             handle: '.drag-handle',
             animation: 150, 
             ghostClass: 'sortable-ghost', 
-            dragClass: 'sortable-drag', 
+            dragClass: 'sortable-drag',
+            fallbackClass: 'sortable-fallback', 
+            forceFallback: true, // Força o clone do navegador (Evita quebrar o Grid no mobile)
+            fallbackOnBody: true, // Impede que o card seja cortado pelo scroll
             filter: '.row-cut-off, .empty-state', 
-            // Previne falhas de Scroll x Drag em Mobile
             delay: 150,
             delayOnTouchOnly: true,
+            
+            onChoose: function () {
+                // Microinteração: Vibração háptica ao "descolar" o card no mobile
+                if (navigator.vibrate) navigator.vibrate(50);
+            },
             
             onEnd: function () {
                 const linhasHTML = DOM.listaMateriasDrag.querySelectorAll('tr[data-id]');

@@ -283,8 +283,22 @@ tr:last-child td { border-bottom: none; }
 .drag-handle { cursor: grab; color: #94A3B8; text-align: center; vertical-align: middle; transition: color 0.2s; touch-action: none; /* Previne rolagem ao tentar arrastar no mobile */ }
 .drag-handle:active { cursor: grabbing; }
 
-.sortable-ghost { opacity: 0.4; background-color: #E2E8F0 !important; }
-.sortable-drag { box-shadow: var(--shadow-lg); background-color: var(--bg-surface) !important; }
+/* O "Fantasma" (Espaço vazio indicando onde o card vai cair) */
+.sortable-ghost { 
+    opacity: 1 !important; 
+    background-color: #F8FAFC !important; 
+    border: 2px dashed #94A3B8 !important; 
+    box-shadow: none !important; 
+}
+.sortable-ghost td { opacity: 0 !important; } /* Esconde o texto/ícones do fantasma */
+
+/* O Card flutuando no dedo do usuário (Efeito Elevado, Reto e Focado) */
+.sortable-drag, .sortable-fallback { 
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1) !important; 
+    filter: brightness(0.96) !important; 
+    cursor: grabbing !important; 
+    z-index: 9999 !important; 
+}
 
 /* Feedback Visual das Filas (Background dinâmico e marcante) */
 .row-active, .row-active td { background-color: #DBEAFE !important; --border-color: #93C5FD; } /* Azul Gelo com linha divisória Azul Escura */
@@ -593,11 +607,17 @@ tr:last-child td { border-bottom: none; }
     
     /* Grip Zone perfeitamente integrada à cor do fundo */
     #tabela-materias td.drag-handle { 
-        grid-column: 1 / 2; grid-row: 1 / 3; 
+        grid-column: 1 / 2; grid-row: 1 / 4; 
         background: rgba(0, 0, 0, 0.05) !important; 
         border-right: 1px solid rgba(0, 0, 0, 0.05); 
         display: flex; align-items: center; justify-content: center;
         border-radius: 0; color: rgba(0, 0, 0, 0.4);
+        transition: background-color 0.1s;
+    }
+    
+    /* Escurece instantaneamente ao encostar o dedo (Pré-Drag) */
+    #tabela-materias td.drag-handle:active {
+        background: rgba(0, 0, 0, 0.15) !important;
     }
     
     #tabela-materias td[data-label="Matéria"] { grid-column: 2 / 3; grid-row: 1 / 2; padding: 16px 0 8px 12px; }
