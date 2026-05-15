@@ -462,7 +462,7 @@ const Views = {
                     badge = `<span class="status-badge" style="color: var(--color-primary);">Ativa</span>`;
                     rowColorClass = 'row-active';
                 } else {
-                    badge = `<span class="status-badge" style="color: var(--text-muted);">Espera</span>`;
+                    badge = `<span class="status-badge" style="color: var(--text-muted);">Fila</span>`;
                     rowColorClass = 'row-waitlist';
                 }
             }
