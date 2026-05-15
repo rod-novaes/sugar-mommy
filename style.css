@@ -277,7 +277,7 @@ tr:last-child td { border-bottom: none; }
 
 .table-progress-container { width: 100%; min-width: 100px; }
 .table-progress-text { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.table-progress-bg { width: 100%; height: 6px; background-color: #E2E8F0; border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.table-progress-bg { width: 100%; height: 6px; background-color: rgba(0, 0, 0, 0.08); border-radius: 3px; overflow: hidden; margin-top: 4px; }
 .table-progress-fill { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
 
 .drag-handle { cursor: grab; color: #94A3B8; text-align: center; vertical-align: middle; transition: color 0.2s; touch-action: none; /* Previne rolagem ao tentar arrastar no mobile */ }
@@ -286,17 +286,17 @@ tr:last-child td { border-bottom: none; }
 .sortable-ghost { opacity: 0.4; background-color: #E2E8F0 !important; }
 .sortable-drag { box-shadow: var(--shadow-lg); background-color: var(--bg-surface) !important; }
 
-/* Feedback Visual das Filas (Background dinâmico) */
-.row-active td { background-color: #F0F9FF; }
-.row-waitlist td { background-color: #F8FAFC; color: #64748B; }
-.row-completed td { background-color: #F0FDF4; opacity: 0.9; }
+/* Feedback Visual das Filas (Background dinâmico e marcante) */
+.row-active, .row-active td { background-color: #DBEAFE !important; --border-color: #93C5FD; } /* Azul Gelo com linha divisória Azul Escura */
+.row-waitlist, .row-waitlist td { background-color: #E2E8F0 !important; color: #475569; --border-color: #CBD5E1; } /* Cinza Asfalto com linha divisória Cinza Escura */
+.row-completed, .row-completed td { background-color: #D1FAE5 !important; opacity: 1; --border-color: #6EE7B7; } /* Verde Menta com linha divisória Verde Escura */
 
 .row-cut-off td { background: transparent; border: none; padding: 32px 8px 16px 8px; }
 .cut-off-divider { display: flex; align-items: center; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 .cut-off-divider::before, .cut-off-divider::after { content: ''; flex: 1; border-bottom: 1px dashed #CBD5E1; margin: 0 16px; }
 
 /* Badges e Tags */
-.status-badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; display: inline-block; margin-left: 8px; }
+.status-badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; display: inline-block; margin-left: 8px; background-color: #FFFFFF; box-shadow: 0 2px 4px rgba(0,0,0,0.06); }
 .badge-peso { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
 .badge-high { background: #FEF2F2; color: #991B1B; }
 .badge-medium { background: #FFFBEB; color: #B45309; }
@@ -573,57 +573,72 @@ tr:last-child td { border-bottom: none; }
         overflow: hidden; 
     }
 
-    /* Marcadores laterais coloridos apenas para a tela Meu Plano */
-    #tabela-materias tr.row-active { border-left: 5px solid var(--color-primary); }
-    #tabela-materias tr.row-waitlist { border-left: 5px solid #94A3B8; }
-    #tabela-materias tr.row-completed { border-left: 5px solid var(--color-success); }
-    
-    .table-container td:not(.drag-handle) { 
-        border: none; padding: 12px 16px; text-align: left; 
-        display: flex; flex-direction: column; align-items: flex-start; gap: 6px; 
+    /* Layout Específico: Card do Meu Plano (Clicável, Integral e 2 Linhas) */
+    #tabela-materias tr:not(.empty-state, .row-cut-off) { 
+        display: grid; 
+        grid-template-columns: 44px 1fr auto; 
+        grid-template-rows: auto auto; 
+        padding: 0; 
+        cursor: pointer;
+        transition: transform 0.15s ease, filter 0.15s ease;
     }
-    .table-container td:not(.drag-handle)::before { 
-        content: attr(data-label); font-weight: 600; color: var(--text-muted); 
-        font-size: 11px; text-transform: uppercase; display: block; 
+    
+    /* Feedback Físico de Clique */
+    #tabela-materias tr:not(.empty-state, .row-cut-off):active {
+        transform: scale(0.98);
+        filter: brightness(0.92);
     }
-    .row-cut-off td { padding: 24px 0 16px 0; background: transparent; }
-
-    /* Layout Específico: Card do Meu Plano */
-    #tabela-materias tr:not(.empty-state, .row-cut-off) { display: grid; grid-template-columns: 1fr auto; padding: 0; }
     
-    #tabela-materias td.drag-handle { grid-column: 1 / -1; grid-row: 1; padding: 8px; border-bottom: 1px solid var(--border-color); text-align: center; background: #F8FAFC; border-radius: 4px 4px 0 0; }
+    #tabela-materias td { border: none; padding: 0; background: transparent !important; }
     
-    #tabela-materias td[data-label="Matéria"] { grid-column: 1 / 2; grid-row: 2; border-bottom: none; padding-right: 8px; padding-bottom: 0; }
+    /* Grip Zone perfeitamente integrada à cor do fundo */
+    #tabela-materias td.drag-handle { 
+        grid-column: 1 / 2; grid-row: 1 / 3; 
+        background: rgba(0, 0, 0, 0.05) !important; 
+        border-right: 1px solid rgba(0, 0, 0, 0.05); 
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 0; color: rgba(0, 0, 0, 0.4);
+    }
+    
+    #tabela-materias td[data-label="Matéria"] { grid-column: 2 / 3; grid-row: 1 / 2; padding: 16px 0 8px 12px; }
     #tabela-materias td[data-label="Matéria"]::before { display: none; }
-    #tabela-materias td[data-label="Matéria"] strong { font-size: 15px; color: var(--color-primary); }
+    #tabela-materias td[data-label="Matéria"] strong { font-size: 16px; color: var(--text-main); }
     
-    #tabela-materias td[data-label="Prioridade"] { grid-column: 2 / 3; grid-row: 2; border-bottom: none; align-items: flex-end; padding-left: 8px; padding-bottom: 0; }
+    #tabela-materias td[data-label="Prioridade"] { grid-column: 3 / 4; grid-row: 1 / 2; padding: 16px 12px 8px 8px; justify-content: flex-end; align-items: center; flex-direction: row; }
     #tabela-materias td[data-label="Prioridade"]::before { display: none; }
     
-    /* Ocultando Teoria e Questões no Card Mobile (Progressive Disclosure) */
+    #tabela-materias td[data-label="Progresso"] { grid-column: 2 / 4; grid-row: 2 / 3; padding: 0 16px 16px 12px; width: 100%; justify-content: center; }
+    #tabela-materias td[data-label="Progresso"]::before { display: none; }
+    
+    /* Ocultando colunas inteiras no Mobile */
+    #tabela-materias td[data-label="Ações"],
     #tabela-materias td[data-label="Teoria"],
     #tabela-materias td[data-label="Questões"] { display: none !important; }
-    
-    #tabela-materias td[data-label="Progresso"] { grid-column: 1 / -1; grid-row: 3; border-bottom: none; padding-top: 12px; padding-bottom: 16px; }
-    
-    #tabela-materias td[data-label="Ações"] { grid-column: 1 / -1; grid-row: 4; flex-direction: row; justify-content: space-around; align-items: center; background-color: #F8FAFC; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 8px; border-top: 1px solid var(--border-color); }
 
-    /* Layout Específico: Card do Diário */
-    #tabela-historico tr:not(.empty-state) { display: grid; grid-template-columns: auto 1fr; padding: 0; }
+    /* Layout Específico: Card do Diário (Compacto Nativo) */
+    #tabela-historico tr:not(.empty-state) { 
+        display: grid; 
+        grid-template-columns: auto 1fr auto; 
+        grid-template-rows: auto auto; 
+        padding: 0; 
+    }
     
-    #tabela-historico td[data-label="Data"] { grid-column: 1 / 2; grid-row: 1; border-bottom: none; padding-right: 8px; padding-bottom: 0; }
+    #tabela-historico td { border: none; padding: 0; }
+    
+    #tabela-historico td[data-label="Matéria"] { grid-column: 1 / 3; grid-row: 1 / 2; padding: 16px 0 6px 16px; }
+    #tabela-historico td[data-label="Matéria"]::before { display: none; }
+    #tabela-historico td[data-label="Matéria"] strong { font-size: 15px; color: var(--text-main); }
+    
+    #tabela-historico td[data-label="Ações"] { grid-column: 3 / 4; grid-row: 1 / 2; flex-direction: row; justify-content: flex-end; padding: 12px 16px 6px 0; background: transparent; gap: 4px; }
+    #tabela-historico td[data-label="Ações"]::before { display: none; }
+    
+    #tabela-historico td[data-label="Data"] { grid-column: 1 / 2; grid-row: 2 / 3; padding: 6px 12px 16px 16px; flex-direction: row; align-items: center; font-size: 13px; color: var(--text-muted); font-weight: 500; }
     #tabela-historico td[data-label="Data"]::before { display: none; }
     
-    #tabela-historico td[data-label="Atividades"] { grid-column: 2 / 3; grid-row: 1; border-bottom: none; padding-left: 8px; padding-bottom: 0; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: flex-start; gap: 4px; }
+    #tabela-historico td[data-label="Atividades"] { grid-column: 2 / 4; grid-row: 2 / 3; padding: 6px 16px 16px 0; flex-direction: row; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 4px; }
     #tabela-historico td[data-label="Atividades"]::before { display: none; }
     
-    #tabela-historico td[data-label="Matéria"] { grid-column: 1 / -1; grid-row: 2; border-bottom: none; padding-top: 8px; padding-bottom: 16px; }
-    #tabela-historico td[data-label="Matéria"]::before { display: none; }
-    #tabela-historico td[data-label="Matéria"] strong { font-size: 15px; color: var(--color-primary); }
-    
     #tabela-historico td[data-label="Comentário"] { display: none !important; }
-    
-    #tabela-historico td[data-label="Ações"] { grid-column: 1 / -1; flex-direction: row; justify-content: space-around; align-items: center; background-color: #F8FAFC; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 8px; border-top: 1px solid var(--border-color); }
 
     /* Paginação Redesenhada (Diário de Estudos) */
     .pagination-footer {

@@ -152,6 +152,7 @@ const Utils = {
                     DOM.formMateria.reset(); 
                     AppContext.editingMateriaId = null; 
                     DOM.modalMateriaTitle.textContent = 'Adicionar Matéria';
+                    document.getElementById('btn-modal-delete-materia')?.classList.add('hidden');
                 }
                 if (el.id === 'modal-registro') { 
                     DOM.formRegistro.reset(); 
@@ -428,7 +429,7 @@ const Views = {
             if (isConcluida && !linhaFinalizadasCriada) {
                 const cutLineFinalizadas = document.createElement('tr');
                 cutLineFinalizadas.className = 'row-cut-off';
-                cutLineFinalizadas.innerHTML = `<td colspan="7"><div class="cut-off-divider">Matérias Finalizadas (Apenas Revisão)</div></td>`;
+                cutLineFinalizadas.innerHTML = `<td colspan="7"><div class="cut-off-divider">Matérias Finalizadas (Apenas Revisão)</div><br></td>`;
                 DOM.listaMateriasDrag.appendChild(cutLineFinalizadas);
                 linhaFinalizadasCriada = true;
             }
@@ -452,15 +453,15 @@ const Views = {
             let rowColorClass = '';
             
             if (isConcluida) {
-                badge = `<span class="status-badge" style="background: #DCFCE7; color: #166534;">Finalizada</span>`;
+                badge = `<span class="status-badge" style="color: var(--color-success);">Finalizada</span>`;
                 rowColorClass = 'row-completed';
             } else {
                 activeRendered++; 
                 if (activeRendered <= limit) {
-                    badge = `<span class="status-badge" style="background: #DBEAFE; color: #1E40AF;">Ativa</span>`;
+                    badge = `<span class="status-badge" style="color: var(--color-primary);">Ativa</span>`;
                     rowColorClass = 'row-active';
                 } else {
-                    badge = `<span class="status-badge" style="background: #F1F5F9; color: #475569;">Espera</span>`;
+                    badge = `<span class="status-badge" style="color: var(--text-muted);">Espera</span>`;
                     rowColorClass = 'row-waitlist';
                 }
             }
@@ -494,7 +495,7 @@ const Views = {
             if (!isConcluida && activeRendered === limit && hasWaitlist) {
                 const cutLine = document.createElement('tr');
                 cutLine.className = 'row-cut-off';
-                cutLine.innerHTML = `<td colspan="7"><div class="cut-off-divider">Em Andamento ↑ | Linha de Espera ↓</div></td>`;
+                cutLine.innerHTML = `<td colspan="7"><div class="cut-off-divider">Em Andamento ↑ | Linha de Espera ↓</div><br></td>`;
                 DOM.listaMateriasDrag.appendChild(cutLine);
             }
         });
@@ -975,6 +976,19 @@ const Controllers = {
             Utils.openModal(DOM.modalRegistro);
         });
 
+        // Botão Lixeira (Dentro do Modal de Edição)
+        document.getElementById('btn-modal-delete-materia')?.addEventListener('click', () => {
+            if (AppContext.editingMateriaId) {
+                const id = AppContext.editingMateriaId;
+                Utils.showConfirmModal('Excluir esta matéria permanentemente?', () => {
+                    Store.state.materias = Store.state.materias.filter(m => m.id !== id);
+                    Store.save(); Views.renderAll();
+                    Utils.closeModal(DOM.modalMateria);
+                    Utils.showToast('Matéria excluída com sucesso.', 'info');
+                });
+            }
+        });
+
         // Eventos Globais de Modais
         document.querySelectorAll('.modal-close-btn, .modal-cancel-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1065,6 +1079,17 @@ const Controllers = {
 
     /* --- Handlers de Delegação de Eventos --- */
     handleTableActions(e) {
+        // Habilidade Mobile: Clique no cartão inteiro para Editar
+        if (window.innerWidth <= 768) {
+            const tr = e.target.closest('#tabela-materias tr[data-id]');
+            const isDragHandle = e.target.closest('.drag-handle');
+            
+            if (tr && !isDragHandle) {
+                this.editMateria(tr.dataset.id);
+                return;
+            }
+        }
+
         const btnEdit = e.target.closest('.btn-action-edit');
         const btnDelete = e.target.closest('.btn-action-delete');
 
@@ -1113,6 +1138,7 @@ const Controllers = {
         if (!mat) return;
         
         AppContext.editingMateriaId = id;
+        document.getElementById('btn-modal-delete-materia')?.classList.remove('hidden');
         document.getElementById('mat-nome').value = mat.nome;
         document.getElementById('mat-peso').value = mat.peso;
         document.getElementById('mat-sessoes').value = mat.sessoes;
