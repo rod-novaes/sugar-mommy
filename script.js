@@ -158,6 +158,7 @@ const Utils = {
                     DOM.formRegistro.reset(); 
                     AppContext.editingRegistroId = null;
                     DOM.modalRegistroTitle.textContent = 'Registro Manual';
+                    document.getElementById('btn-modal-delete-registro')?.classList.add('hidden');
                 }
                 if (el.id === 'modal-confirm') {
                     AppContext.confirmActionCallback = null;
@@ -905,6 +906,7 @@ const Views = {
             if (m > 0) tagsAtividade += `<span class="tag-atividade tag-manutencao" style="margin-right:4px;">${m} Revisão</span>`;
 
             const tr = document.createElement('tr');
+            tr.dataset.id = reg.id;
             tr.innerHTML = `
                 <td data-label="Data">${dt}</td>
                 <td data-label="Matéria"><strong>${nomeMateria}</strong></td>
@@ -976,7 +978,7 @@ const Controllers = {
             Utils.openModal(DOM.modalRegistro);
         });
 
-        // Botão Lixeira (Dentro do Modal de Edição)
+        // Botões Lixeira (Dentro dos Modais de Edição)
         document.getElementById('btn-modal-delete-materia')?.addEventListener('click', () => {
             if (AppContext.editingMateriaId) {
                 const id = AppContext.editingMateriaId;
@@ -985,6 +987,18 @@ const Controllers = {
                     Store.save(); Views.renderAll();
                     Utils.closeModal(DOM.modalMateria);
                     Utils.showToast('Matéria excluída com sucesso.', 'info');
+                });
+            }
+        });
+        
+        document.getElementById('btn-modal-delete-registro')?.addEventListener('click', () => {
+            if (AppContext.editingRegistroId) {
+                const id = AppContext.editingRegistroId;
+                Utils.showConfirmModal('Desfazer este registro? O cronograma irá devolver esta sessão como pendente.', () => {
+                    Store.state.registros = Store.state.registros.filter(r => r.id !== id);
+                    Store.save(); Views.renderAll();
+                    Utils.closeModal(DOM.modalRegistro);
+                    Utils.showToast('Registro excluído.', 'info');
                 });
             }
         });
@@ -1081,11 +1095,16 @@ const Controllers = {
     handleTableActions(e) {
         // Habilidade Mobile: Clique no cartão inteiro para Editar
         if (window.innerWidth <= 768) {
-            const tr = e.target.closest('#tabela-materias tr[data-id]');
+            const trMateria = e.target.closest('#tabela-materias tr[data-id]');
             const isDragHandle = e.target.closest('.drag-handle');
+            if (trMateria && !isDragHandle) {
+                this.editMateria(trMateria.dataset.id);
+                return;
+            }
             
-            if (tr && !isDragHandle) {
-                this.editMateria(tr.dataset.id);
+            const trRegistro = e.target.closest('#tabela-historico tr[data-id]');
+            if (trRegistro) {
+                this.editRegistro(trRegistro.dataset.id);
                 return;
             }
         }
@@ -1162,6 +1181,7 @@ const Controllers = {
         if (!reg) return;
         
         AppContext.editingRegistroId = id;
+        document.getElementById('btn-modal-delete-registro')?.classList.remove('hidden');
         document.getElementById('reg-data').value = reg.data;
         document.getElementById('reg-materia').value = reg.idMateria;
         document.getElementById('reg-tipo').value = reg.tipo;
