@@ -495,7 +495,7 @@ const Views = {
             if (!isConcluida && activeRendered === limit && hasWaitlist) {
                 const cutLine = document.createElement('tr');
                 cutLine.className = 'row-cut-off';
-                cutLine.innerHTML = `<td colspan="7"><div class="cut-off-divider">Em Andamento ↑ | Linha de Espera ↓</div><br></td>`;
+                cutLine.innerHTML = `<td colspan="7"><div class="cut-off-divider">Em Andamento ↑ | Fila de Espera ↓</div><br></td>`;
                 DOM.listaMateriasDrag.appendChild(cutLine);
             }
         });
