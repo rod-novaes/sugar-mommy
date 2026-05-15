@@ -710,12 +710,19 @@ tr:last-child td { border-bottom: none; }
     .slots-input { width: 100%; justify-content: space-between; background: #F8FAFC; padding: 12px; border-radius: 8px;}
 
     /* Modais, Toasts e Touch Targets */
-    .modal-content {
-        max-width: 100%; margin: 32px 16px; 
-        /* Força margem segura e habilita barra de rolagem interna mais cedo */
-        max-height: calc(100dvh - 120px); 
-        overflow-y: auto;
+    .modal-overlay {
+        padding: 32px 16px; /* Transfere a responsabilidade da margem para o contêiner (Resolve o corte no Chrome) */
+        align-items: flex-start; /* Evita o bug do flexbox que engole o topo da janela */
     }
+    
+    .modal-content {
+        width: 100%; 
+        max-width: 100%; 
+        margin: auto; /* Centraliza verticalmente se o modal for pequeno */
+        max-height: 100%; /* Respeita estritamente o padding de 32px do overlay */
+        overflow-y: auto; /* Habilita rolagem interna perfeitamente encaixada */
+    }
+    
     .modal-body {
         padding-bottom: 40px; /* Respiro extra para teclado no celular */
     }
