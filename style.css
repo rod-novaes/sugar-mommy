@@ -911,9 +911,21 @@ tr:last-child td { border-bottom: none; }
         overflow: hidden; 
     }
 
-    /* Empty State: Garante que as mensagens de vazio apareçam e não sejam esmagadas pela tabela */
-    tr.empty-state { display: block !important; border: none !important; background: transparent !important; box-shadow: none !important; padding: 32px 0; }
-    tr.empty-state td { display: block; width: 100%; padding: 0; text-align: center; }
+    /* Correção Blindada do Empty State no Mobile (Impede o Grid de esmagar o conteúdo) */
+    #tabela-materias tr.empty-state, #tabela-historico tr.empty-state {
+        display: block !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin-top: 32px;
+    }
+    #tabela-materias tr.empty-state td, #tabela-historico tr.empty-state td {
+        display: block !important;
+        width: 100% !important;
+        border: none !important;
+        padding: 0 !important;
+    }
 
     /* Layout Específico: Card do Meu Plano (Clicável, Integral e 2 Linhas) */
     #tabela-materias tr:not(.empty-state, .row-cut-off) {

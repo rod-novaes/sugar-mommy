@@ -433,10 +433,14 @@ const Views = {
         if (Store.state.materias.length === 0) {
             DOM.listaMateriasDrag.innerHTML = `
                 <tr class="empty-state">
-                    <td colspan="7" class="text-center">
-                        <div class="empty-state-container">
-                            <span class="material-symbols-outlined empty-icon">inventory_2</span>
-                            <p>Nenhuma matéria cadastrada ainda. Clique em "Nova Matéria" para começar.</p>
+                    <td colspan="7">
+                        <div class="onboarding-wrapper" style="margin: 0 auto; box-shadow: none; background: transparent; border: 1px dashed var(--border-color);">
+                            <span class="material-symbols-outlined empty-icon" style="color: var(--color-primary); opacity: 1;">library_books</span>
+                            <h3 style="margin-top: 16px;">Sua Lista de Matérias</h3>
+                            <p>Adicione as disciplinas que você está estudando para que possamos organizar sua fila de prioridades.</p>
+                            <button class="btn btn-primary" onclick="Utils.openModal(document.getElementById('modal-materia'))">
+                                <span class="material-symbols-outlined">add</span> Adicionar Matéria
+                            </button>
                         </div>
                     </td>
                 </tr>`;
@@ -1044,10 +1048,14 @@ const Views = {
         if (Store.state.registros.length === 0) {
             DOM.tabelaHistoricoBody.innerHTML = `
                 <tr class="empty-state">
-                    <td colspan="5" class="text-center">
-                        <div class="empty-state-container">
-                            <span class="material-symbols-outlined empty-icon">history</span>
-                            <p>Nenhum estudo registrado ainda.</p>
+                    <td colspan="5">
+                        <div class="onboarding-wrapper" style="margin: 0 auto; box-shadow: none; background: transparent; border: 1px dashed var(--border-color);">
+                            <span class="material-symbols-outlined empty-icon" style="color: var(--color-primary); opacity: 1;">history</span>
+                            <h3 style="margin-top: 16px;">Diário Vazio</h3>
+                            <p>Nenhum estudo foi registrado ainda. Cumpra suas metas pelo Cronograma ou adicione uma sessão manualmente.</p>
+                            <button class="btn btn-primary" onclick="document.getElementById('reg-data').value = Utils.getTodayStr(); Utils.openModal(document.getElementById('modal-registro'))">
+                                <span class="material-symbols-outlined">add</span> Adicionar Estudo
+                            </button>
                         </div>
                     </td>
                 </tr>`;
@@ -1120,8 +1128,11 @@ const Views = {
         if (!currentView) return;
         const targetViewId = currentView.id;
         
+        const hasMaterias = Store.state.materias.length > 0;
+        
+        // Inteligência: Título adaptativo caso o app esteja no modo Onboarding (Vazio)
         const titles = {
-            'view-dashboard': 'Progresso',
+            'view-dashboard': hasMaterias ? 'Progresso' : 'Bem-vindo(a)',
             'view-schedule': 'Cronograma',
             'view-plan': 'Matérias',
             'view-diary': 'Diário de Estudo',
@@ -1131,8 +1142,8 @@ const Views = {
         const headerTitle = document.getElementById('header-title');
         const headerBrandIcon = document.getElementById('header-brand-icon');
         const headerWeekControls = document.getElementById('header-week-controls');
+        const innerWeekControls = document.querySelector('.inner-week-controls'); // Controle Desktop
         
-        // A lógica do título é unificada: Sempre define o nome correto
         if (headerTitle) {
             headerTitle.classList.remove('hidden');
             headerTitle.textContent = titles[targetViewId];
@@ -1140,11 +1151,16 @@ const Views = {
         
         if (headerBrandIcon) headerBrandIcon.classList.remove('hidden');
         
-        // O controle do Topo (Mobile Cronograma) só é injetado se houver matérias
-        if (targetViewId === 'view-schedule' && Store.state.materias.length > 0) {
+        // Oculta/Exibe a navegação da semana no Mobile (Topo)
+        if (targetViewId === 'view-schedule' && hasMaterias) {
             if (headerWeekControls) headerWeekControls.classList.remove('hidden');
         } else {
             if (headerWeekControls) headerWeekControls.classList.add('hidden');
+        }
+        
+        // Oculta a navegação da semana no Desktop (Interno) se não houver dados
+        if (innerWeekControls) {
+            innerWeekControls.classList.toggle('hidden', !hasMaterias);
         }
     },
 
