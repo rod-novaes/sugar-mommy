@@ -1540,22 +1540,36 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof Sortable !== 'undefined' && DOM.listaMateriasDrag) {
         Sortable.create(DOM.listaMateriasDrag, {
             handle: '.drag-handle',
-            animation: 150, 
+            animation: 200, // Transição um pouco mais suave ao reordenar
             ghostClass: 'sortable-ghost', 
             dragClass: 'sortable-drag',
             fallbackClass: 'sortable-fallback', 
-            forceFallback: true, // Força o clone do navegador (Evita quebrar o Grid no mobile)
-            fallbackOnBody: true, // Impede que o card seja cortado pelo scroll
+            forceFallback: true, 
+            fallbackOnBody: true,
             filter: '.row-cut-off, .empty-state', 
-            delay: 150,
-            delayOnTouchOnly: true,
             
-            onChoose: function () {
-                // Microinteração: Vibração háptica ao "descolar" o card no mobile
-                if (navigator.vibrate) navigator.vibrate(50);
+            /* --- Blindagem de Scroll Mobile (Fase 3) --- */
+            delay: 250, // 250ms é o tempo exato do "Long Press" nativo de fábrica
+            delayOnTouchOnly: true,
+            touchStartThreshold: 5, // Se o dedo escorregar 5px antes do delay, o drag é cancelado para permitir a rolagem
+            
+            onChoose: function (evt) {
+                // O celular avisa fisicamente com 3 vibrações rápidas que o cartão "descolou"
+                Utils.haptic('success'); 
+                
+                // Microinteração GSAP: Cartão levanta fisicamente em direção ao dedo do usuário
+                gsap.to(evt.item, { scale: 1.02, duration: 0.2, ease: "back.out(1.7)" });
             },
             
-            onEnd: function () {
+            onUnchoose: function (evt) {
+                // Remove o efeito caso o usuário solte o cartão sem movê-lo de lugar
+                gsap.to(evt.item, { scale: 1, duration: 0.2 });
+            },
+            
+            onEnd: function (evt) {
+                // Devolve a escala original ao soltar na nova posição
+                gsap.to(evt.item, { scale: 1, duration: 0.2 });
+                
                 const linhasHTML = DOM.listaMateriasDrag.querySelectorAll('tr[data-id]');
                 const novaOrdemIds = Array.from(linhasHTML).map(row => row.dataset.id);
                 
@@ -1563,6 +1577,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 Store.save();
                 Views.renderAll(); 
+                
+                // Confirmação final dupla (O showToast agora já aciona o pulso de sucesso)
                 Utils.showToast('Fila reordenada.', 'success');
             }
         });
