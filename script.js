@@ -121,17 +121,23 @@ const Utils = {
         return new Date().toISOString().split('T')[0];
     },
 
+    /* --- Motor Nativo de Feedback Tátil (Hardware) --- */
+    haptic(pattern = 'light') {
+        if (!navigator.vibrate) return;
+        if (pattern === 'light') navigator.vibrate(15); // Clique sutil (Troca de abas)
+        else if (pattern === 'success') navigator.vibrate([30, 50, 30]); // Duplo pulso (Celebração/Check)
+        else if (pattern === 'warning') navigator.vibrate([40, 60, 40]); // Vibração de alerta (Exclusão)
+    },
+
     openModal(el) {
         if (!el) return;
         el.classList.remove('hidden');
         
-        // Animação GSAP: Fundo aparece suavemente
         gsap.fromTo(el, 
             { opacity: 0, backdropFilter: "blur(0px)" }, 
             { opacity: 1, backdropFilter: "blur(2px)", duration: 0.3 }
         );
         
-        // Animação GSAP: Modal ganha vida com um leve "pulo" (back.out)
         const content = el.querySelector('.modal-content');
         if (content) {
             gsap.fromTo(content, 
@@ -152,7 +158,6 @@ const Utils = {
             onComplete: () => {
                 el.classList.add('hidden');
                 
-                // Limpeza segura dos formulários após o modal sumir
                 if (el.id === 'modal-materia') { 
                     DOM.formMateria.reset(); 
                     AppContext.editingMateriaId = null; 
@@ -173,6 +178,7 @@ const Utils = {
     },
 
     showConfirmModal(message, callback) {
+        this.haptic('warning'); // Dispara Haptic de atenção
         DOM.modalConfirmMsg.textContent = message;
         AppContext.confirmActionCallback = callback;
         this.openModal(DOM.modalConfirm);
@@ -180,6 +186,10 @@ const Utils = {
 
     showToast(message, type = 'info') {
         if (!DOM.toastContainer) return;
+        
+        // Conecta o motor háptico aos toques de sucesso ou erro automáticos
+        if (type === 'success') this.haptic('success');
+        else if (type === 'error') this.haptic('warning');
         
         const toast = document.createElement('div');
         toast.className = 'toast';
@@ -620,7 +630,8 @@ const Views = {
             let colHtml = `
                 <div class="kanban-header">
                     <span class="kanban-header-day">${diasSemanaNomes[i]}</span>
-                    <span class="kanban-header-date">${isToday ? 'HOJE - ' : ''}${dataDisplay}</span>
+                    <span class="kanban-header-date" style="opacity: 0.4;">•</span>
+                    <span class="kanban-header-date">${isToday ? '<strong style="color: var(--color-primary);">HOJE</strong> ' : ''}${dataDisplay}</span>
                 </div>
             `;
 
@@ -700,12 +711,14 @@ const Views = {
             kanbanContainer.appendChild(colEl);
         }
 
-        // Auto-Scroll Mobile corrigido para não entrar em conflito com o Snap
+        // Auto-Scroll Mobile para Scroll Snap Magnético
         if (window.innerWidth <= 768 && AppContext.weekOffset === 0) {
             setTimeout(() => {
                 const todayCol = kanbanContainer.querySelector('.kanban-column.is-today');
                 if (todayCol) {
-                    kanbanContainer.scrollTo({ left: todayCol.offsetLeft - 16, behavior: 'smooth' });
+                    // O comando nativo 'scrollIntoView' calcula automaticamente a matemática 
+                    // perfeita para alinhar o card magnético no centro (inline: 'center')
+                    todayCol.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                 }
             }, 100);
         }
@@ -1189,20 +1202,30 @@ const Controllers = {
         
         if (currentView === targetView) return;
 
-        // Linha do tempo GSAP para suavizar a saída da tela velha e entrada da nova
+        // Micro-vibração ao clicar na Bottom Navigation (Efeito físico do botão)
+        Utils.haptic('light');
+
+        // Linha do tempo GSAP recriando a transição nativa de Pilha (Stack)
         const timeline = gsap.timeline();
 
         if (currentView) {
+            // A tela atual é levemente empurrada para a esquerda (-x) e some
             timeline.to(currentView, {
-                opacity: 0, y: -10, duration: 0.2, ease: "power2.in",
-                onComplete: () => currentView.classList.add('hidden')
+                opacity: 0, x: -30, duration: 0.2, ease: "power2.in",
+                onComplete: () => {
+                    currentView.classList.add('hidden');
+                    gsap.set(currentView, { x: 0 }); // Limpa o rastro de posição
+                }
             });
         }
 
         timeline.call(() => {
-            if (targetView) targetView.classList.remove('hidden');
+            if (targetView) {
+                targetView.classList.remove('hidden');
+                gsap.set(targetView, { x: 40, opacity: 0 }); // Posiciona a nova tela para entrar pela direita (+x)
+            }
             
-            // Controle dos Botões Flutuantes (Mobile) com Efeito "Pop"
+            // Controle dos Botões Flutuantes (Mobile) com Efeito "Pop" de mola
             const fabMateria = document.getElementById('fab-add-materia');
             const fabRegistro = document.getElementById('fab-add-registro');
             if (fabMateria) {
@@ -1218,9 +1241,9 @@ const Controllers = {
         });
 
         if (targetView) {
-            timeline.fromTo(targetView, 
-                { opacity: 0, y: 15 }, 
-                { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
+            // A nova tela desliza magneticamente para o centro (0)
+            timeline.to(targetView, 
+                { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }
             );
         }
     },
@@ -1262,6 +1285,8 @@ const Controllers = {
     handleKanbanAction(e) {
         const btn = e.target.closest('.kanban-action-btn');
         if (!btn) return;
+
+        Utils.haptic('light'); // Confirmação tátil instantânea de que o botão foi clicado
 
         const payload = JSON.parse(btn.dataset.payload);
         const action = btn.dataset.action;

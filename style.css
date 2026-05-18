@@ -685,50 +685,56 @@ tr:last-child td { border-bottom: none; }
     .chart-card { min-height: auto; width: 100%; overflow: hidden; padding: 16px;}
     .chart-wrapper { width: 100%; min-width: 0; overflow-x: auto; }
 
-    /* Cronograma Kanban Mobile (Carrossel) */
-    .view-header { flex-direction: column; align-items: flex-start; gap: 16px; }
-    .week-nav-controls { width: 100%; justify-content: space-between; }
+    /* Cronograma Kanban Mobile (Carrossel Nativo Paginado) */
+    
+    /* Oculta os textos (Título/Subtítulo) para limpar o topo */
+    #view-schedule .view-header > div:first-child { display: none; }
+    #view-schedule .view-header { margin-bottom: 0; gap: 8px; }
+    
+    .week-nav-controls { width: 100%; justify-content: space-between; padding: 8px 0; }
     .week-label-container { flex: 1; }
     
     .kanban-board {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    padding: 16px; /* Adicionado padding interno */
-    padding-bottom: 24px;
-    align-items: flex-start;
-    background-color: #F8FAFC; /* Fundo sutil para a área arrastável */
-    border: 1px dashed var(--border-color);
-    border-radius: var(--radius-lg);
-    cursor: grab; /* Indica que a área pode ser puxada */
+        display: flex;
+        gap: 12px; /* Espaço sutil entre as páginas dos dias */
+        overflow-x: auto;
+        padding: 16px 16px 32px 16px;
+        
+        /* Alinhamento em 'stretch' inverte a física: o conteúdo cresce livremente e a TELA rola na vertical */
+        align-items: stretch; 
+        background-color: transparent;
+        border: none; 
+        
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; 
     }
-    .kanban-board:active {
-        cursor: grabbing;
-    }
-
-    /* Barra de Rolagem Horizontal Customizada (Confortável e Moderna) */
-    .kanban-board::-webkit-scrollbar {
-        height: 12px; 
-    }
-    .kanban-board::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: 6px;
-        margin: 0 16px; /* Desgruda das bordas do card */
-    }
-    .kanban-board::-webkit-scrollbar-thumb {
-        background-color: #CBD5E1;
-        border-radius: 6px;
-        border: 3px solid #F8FAFC; /* Cria um "padding" falso na barra */
-    }
-    .kanban-board::-webkit-scrollbar-thumb:hover {
-        background-color: #94A3B8;
-    }
+    .kanban-board::-webkit-scrollbar { display: none; }
     
     .kanban-column {
-        scroll-snap-align: center; 
-        flex: 0 0 85%; 
-        min-width: 85%;
+        scroll-snap-align: center;
+        flex: 0 0 92%; /* Aumenta a largura, deixa um 'filete' de 8% alertando que há um próximo dia */
+        min-width: 92%;
+        
+        /* Remove o visual de "bloco isolado" e adota o visual de "Página" (Fundo transparente, sem bordas) */
+        background-color: transparent !important; 
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0;
     }
+    
+    /* Cabeçalho do dia da semana fluido (Linha única na horizontal) */
+    .kanban-column .kanban-header {
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        padding-bottom: 16px;
+        margin-bottom: 16px;
+        border-bottom: 1px dashed #CBD5E1;
+    }
+    .kanban-column .kanban-header-day { font-size: 16px; }
+    .kanban-column .kanban-header-date { font-size: 14px; font-weight: 500; margin-top: 1px; }
 
     /* Botões Flutuantes (FABs) e Ocultação Desktop */
     .desktop-btn { display: none; }
