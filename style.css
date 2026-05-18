@@ -109,16 +109,45 @@ h1, h2, h3, h4 {
 }
 
 #top-header {
-    height: 60px;
-    background-color: var(--bg-surface);
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: center; /* Centraliza o Título e Controles em todas as telas */
-    align-items: center;
-    padding: 0 24px;
-    box-shadow: var(--shadow-sm);
-    z-index: 10;
+    display: none; /* Desktop: Barra superior apagada! Todo o espaço vai para os estudos. */
 }
+
+/* --- Elementos Exclusivos da Sidebar (Desktop) --- */
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    color: var(--text-inverse);
+}
+.sidebar-brand h1 {
+    font-size: 18px;
+    letter-spacing: -0.5px;
+    color: var(--text-inverse);
+}
+
+.sidebar-footer {
+    margin-top: auto; /* Truque flexbox: empurra o perfil para o final da tela */
+    padding: 20px 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #94A3B8;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+}
+.sidebar-footer:hover {
+    color: var(--text-inverse);
+    background-color: var(--bg-sidebar-hover);
+}
+.avatar-mini {
+    width: 32px; height: 32px; border-radius: 50%;
+    background-color: #334155; display: flex; align-items: center; justify-content: center;
+    color: #FFFFFF;
+}
+.user-name { font-size: 13px; font-weight: 500; }
+/* ------------------------------------------------ */
 
 .brand {
     display: flex;
@@ -714,18 +743,48 @@ tr:last-child td { border-bottom: none; }
     body { overscroll-behavior-y: none; background-color: #F1F5F9; }
     #app-body { flex-direction: column; }
     
-    /* Espaço extra no fundo garantindo que o scroll passe por cima de Barras Flutuantes */
-    #main-content { padding: 16px 16px 200px 16px; overflow-x: hidden; }
+    /* Espaço extra no topo e no fundo para suportar barras fixas e flutuantes (Glassmorphism) */
+    #main-content { 
+        padding: calc(80px + env(safe-area-inset-top)) 16px 200px 16px; 
+        overflow-x: hidden; 
+    }
 
-    /* Header (Dynamic App Bar Nativa) */
-    #top-header { padding: 0 16px; height: 64px; justify-content: center; }
+    /* Header (Tinted Glassmorphism - Premium App Bar) */
+    #top-header { 
+        display: flex; 
+        position: fixed; /* Descola da página, permitindo que o conteúdo role por trás */
+        top: 0; left: 0; right: 0;
+        height: calc(64px + env(safe-area-inset-top)); 
+        padding: env(safe-area-inset-top) 16px 0 16px;
+        justify-content: center; 
+        align-items: center;
+        background-color: #3B82F6; /* Azul Primário com 90% de opacidade */
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px); /* Suporte essencial para iOS */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 1000;
+    }
     
     .brand h1 { 
         display: block; 
         font-size: 18px; 
-        color: var(--text-main); 
+        color: #FFFFFF; /* Contraste absoluto e brilhante */
+        font-weight: 600;
+        letter-spacing: 0.5px;
     } 
     .brand .icon-brand { display: none; }
+
+    /* Estilização dos Botões do Cronograma para brilharem no fundo Azul */
+    #top-header .week-label-container { color: #FFFFFF; font-weight: 600; }
+    #top-header .btn-secondary { 
+        background-color: rgba(255, 255, 255, 0.2); /* Fundo branco translúcido */
+        color: #FFFFFF; 
+        border: 1px solid rgba(255, 255, 255, 0.1); 
+    }
+    #top-header .btn-secondary:active { background-color: rgba(255, 255, 255, 0.35); }
+    
+    /* Esconde os itens do Desktop da Bottom Navigation Mobile */
+    .sidebar-brand, .sidebar-footer { display: none !important; }
     
     /* Engine Mobile do Cronograma: Ativa o controle do topo e desativa o título do app */
     body[data-view="view-schedule"] .brand h1 { display: none; }
