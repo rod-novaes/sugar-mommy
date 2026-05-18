@@ -113,7 +113,7 @@ h1, h2, h3, h4 {
     background-color: var(--bg-surface);
     border-bottom: 1px solid var(--border-color);
     display: flex;
-    justify-content: space-between;
+    justify-content: center; /* Centraliza o Título e Controles em todas as telas */
     align-items: center;
     padding: 0 24px;
     box-shadow: var(--shadow-sm);
@@ -123,6 +123,7 @@ h1, h2, h3, h4 {
 .brand {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 12px;
     color: var(--color-primary);
 }
@@ -130,11 +131,7 @@ h1, h2, h3, h4 {
 .brand h1 {
     font-size: 18px;
     letter-spacing: -0.5px;
-}
-
-.toolbar {
-    display: flex;
-    gap: 12px;
+    transition: opacity 0.2s;
 }
 
 #app-body {
@@ -181,9 +178,52 @@ h1, h2, h3, h4 {
 }
 
 .view-header { margin-bottom: 24px; }
-.view-header h2 { font-size: 24px; margin-bottom: 4px; }
+.view-header h2 { font-size: 24px; margin-bottom: 4px; letter-spacing: -0.5px; }
 .subtitle { color: var(--text-muted); }
 .section-title { font-size: 18px; margin: 32px 0 16px 0; }
+
+/* O Greeting Card vira um Banner Premium (Hero Section) */
+.greeting-card {
+    background: linear-gradient(135deg, #EFF6FF 0%, #FFFFFF 100%);
+    border: 1px solid #BFDBFE;
+    border-radius: var(--radius-lg);
+    padding: 32px 40px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Fita lateral para ancorar a identidade visual */
+.greeting-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background-color: var(--color-primary);
+}
+
+.greeting-card h2 { 
+    font-size: 28px; 
+    color: var(--color-primary); 
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.greeting-card .subtitle { 
+    font-size: 15px; 
+    color: var(--text-main);
+    font-weight: 500;
+    opacity: 0.85;
+}
+
+/* Engine Visual Híbrida: Por padrão (Desktop), a barra do topo não exibe controles de semana */
+.top-week-controls { display: none !important; }
 
 
 /* ========================================================================== */
@@ -492,35 +532,54 @@ tr:last-child td { border-bottom: none; }
     height: 100%; border-radius: 3px; transition: width 0.4s ease; background-color: currentColor;
 }
 
-/* --- 3.7 WIZARD DE CONFIGURAÇÕES --- */
-.stepper { display: flex; align-items: center; justify-content: space-between; }
-.step { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--text-muted); }
-.step.active { color: var(--color-primary); }
-.step-num { width: 28px; height: 28px; border-radius: 50%; background: #E2E8F0; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-.step.active .step-num { background: var(--color-primary); color: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.1); }
-.step-line { flex: 1; height: 2px; background: #E2E8F0; margin: 0 24px; }
-
+/* --- 3.7 LISTA DE CONFIGURAÇÕES NATIVA --- */
 .slider-group { display: flex; align-items: center; gap: 16px; margin-top: 8px; }
 .custom-slider { flex: 1; accent-color: var(--color-primary); cursor: pointer; }
 .slider-output { font-weight: 600; color: var(--color-primary); background: #EFF6FF; padding: 4px 12px; border-radius: 12px; font-size: 14px; min-width: 80px; text-align: center; }
 
-.day-card { border: 1px solid var(--border-color); border-left-width: 5px; border-radius: var(--radius-md); padding: 16px 20px; margin-bottom: 12px; transition: all 0.3s ease; background: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; gap: 24px; }
-.day-header { font-weight: 600; font-size: 15px; width: 120px; flex-shrink: 0; }
-.day-controls { display: flex; gap: 24px; flex: 1; align-items: center; justify-content: space-between; }
+/* Lista Minimalista para Dias da Semana */
+.settings-list {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-surface);
+    overflow: hidden;
+}
 
-.segmented-control { display: flex; background: #F1F5F9; border-radius: 8px; padding: 4px; gap: 4px; flex: 1; max-width: 400px; }
-.segmented-control label { flex: 1; text-align: center; padding: 8px 0; font-size: 13px; font-weight: 500; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
-.segmented-control input { display: none; }
-.segmented-control label:has(input:checked) { background: #fff; color: var(--text-main); box-shadow: var(--shadow-sm); font-weight: 600; }
+.settings-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s;
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row:hover { background-color: #F8FAFC; }
 
-.slots-input { display: flex; align-items: center; gap: 8px; }
-.slots-input label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-.slots-input input { width: 70px; text-align: center; font-weight: 600; }
+.settings-label { font-weight: 500; font-size: 14px; color: var(--text-main); }
+.settings-controls { display: flex; align-items: center; gap: 12px; }
 
-.day-card:has(input[value="teoria"]:checked) { border-left-color: var(--color-primary); background-color: #FAFCFF; }
-.day-card:has(input[value="questoes"]:checked) { border-left-color: var(--color-warning); background-color: #FFFCF5; }
-.day-card:has(input[value="manutencao"]:checked) { border-left-color: var(--color-success); background-color: #F6FDF9; }
-.day-card:has(input[value="descanso"]:checked) { border-left-color: var(--color-secondary); background-color: #F8FAFC; opacity: 0.8; }
+/* Controles Menores para caber no celular sem quebrar a linha */
+.select-compact {
+    padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border-color);
+    background: #F8FAFC; font-size: 13px; color: var(--text-main);
+    outline: none; cursor: pointer; transition: all 0.2s;
+}
+.select-compact:focus { border-color: var(--color-primary); box-shadow: 0 0 0 2px rgba(37,99,235,0.1); }
+
+.input-compact {
+    width: 60px !important; padding: 6px; text-align: center; border-radius: 6px;
+    border: 1px solid var(--border-color); background: #F8FAFC; font-weight: 600;
+}
+
+/* --- 3.8 MINHA CONTA E DADOS --- */
+.account-card { background-color: #F8FAFC; border: 1px solid #E2E8F0; }
+.account-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.avatar-placeholder { width: 56px; height: 56px; border-radius: 50%; background: #CBD5E1; display: flex; align-items: center; justify-content: center; color: #FFFFFF; }
+.account-info h3 { font-size: 16px; color: var(--text-main); margin-bottom: 2px; }
+.account-info p { font-size: 13px; color: var(--text-muted); }
+.account-divider { border-top: 1px solid var(--border-color); padding-top: 16px; margin-bottom: 16px; font-size: 14px; font-weight: 600; color: var(--text-main); }
+.bg-white { background-color: #FFFFFF !important; }
 
 /* --- 3.8 MODAIS E TOASTS --- */
 .modal-overlay {
@@ -557,6 +616,7 @@ tr:last-child td { border-bottom: none; }
 .mt-3 { margin-top: 24px; }
 .mb-2 { margin-bottom: 16px; }
 .mb-3 { margin-bottom: 32px; }
+.mb-5 { margin-bottom: 80px; } /* Cria o empurrão vertical necessário */
 .ml-2 { margin-left: 8px; }
 .p-4 { padding: 24px; }
 .icon-sm { font-size: 18px !important; }
@@ -654,15 +714,32 @@ tr:last-child td { border-bottom: none; }
     body { overscroll-behavior-y: none; background-color: #F1F5F9; }
     #app-body { flex-direction: column; }
     
-    /* Espaço extra no fundo para não ser coberto pela Navigation Bar + Respiro visual */
-    #main-content { padding: 16px 16px 140px 16px; overflow-x: hidden; }
+    /* Espaço extra no fundo garantindo que o scroll passe por cima de Barras Flutuantes */
+    #main-content { padding: 16px 16px 200px 16px; overflow-x: hidden; }
 
-    /* Header */
-    #top-header { padding: 0 16px; height: 64px; }
-    .brand h1 { display: none; }
-    .brand .icon-brand { font-size: 28px; }
-    .toolbar .btn-label { display: none; }
-    .toolbar .btn-icon { padding: 10px; }
+    /* Header (Dynamic App Bar Nativa) */
+    #top-header { padding: 0 16px; height: 64px; justify-content: center; }
+    
+    .brand h1 { 
+        display: block; 
+        font-size: 18px; 
+        color: var(--text-main); 
+    } 
+    .brand .icon-brand { display: none; }
+    
+    /* Engine Mobile do Cronograma: Ativa o controle do topo e desativa o título do app */
+    body[data-view="view-schedule"] .brand h1 { display: none; }
+    body[data-view="view-schedule"] .top-week-controls { display: flex !important; }
+    
+    /* Oculta cabeçalhos internos no Mobile, COM EXCEÇÃO do Greeting Card que deve aparecer */
+    .view-header:not(.greeting-card) { display: none !important; }
+    
+    .greeting-card { 
+        margin-top: 0; /* A margem superior zera para colar um pouco mais no topo da tela */
+        margin-bottom: 24px; 
+        padding: 24px 20px 24px 24px; /* Ajuste ergonômico do padding para telas verticais */
+    }
+    .greeting-card h2 { font-size: 22px; margin-bottom: 4px; }
 
     /* Revolução: Bottom Navigation Bar */
     #sidebar {
@@ -881,20 +958,13 @@ tr:last-child td { border-bottom: none; }
     .select-page-size { display: none; } /* Esconde o Dropdown no celular */
     #diary-page-info { margin-left: 0; display: block; font-size: 12px; color: #94A3B8; }
 
-    /* Wizard Configurações */
+    /* Configurações (Ajustes de UI Mobile) */
     .form-row { flex-direction: column; gap: 16px; }
-    .stepper { flex-wrap: wrap; justify-content: center; gap: 8px;}
-    .step span:not(.step-num) { display: none; }
-    .step-line { width: 40px; margin: 0 4px; flex: none; }
-
-    .day-card { flex-direction: column; gap: 16px; align-items: stretch; padding: 16px; }
-    .day-header { width: 100%; font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;}
-    .day-controls { width: 100%; flex-direction: column; gap: 16px;}
     
-    .segmented-control { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 100%; background: transparent; padding: 0; }
-    .segmented-control label { background: #F1F5F9; border: 1px solid var(--border-color); padding: 10px 0; }
-    .segmented-control label:has(input:checked) { border-color: var(--color-primary); }
-    .slots-input { width: 100%; justify-content: space-between; background: #F8FAFC; padding: 12px; border-radius: 8px;}
+    /* Protege as Colunas da Lista Nativa no Mobile */
+    .settings-row { padding: 12px; }
+    .settings-controls { gap: 8px; }
+    .select-compact { max-width: 130px; font-size: 12px; padding: 6px 8px; }
 
     /* Modais, Toasts e Touch Targets */
     .modal-overlay {

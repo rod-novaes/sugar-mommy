@@ -30,23 +30,22 @@
         <!-- Barra superior contendo a marca e o menu de controle de arquivos -->
         <!-- ====================================================================== -->
         <header id="top-header">
-            <div class="brand">
-                <span class="material-symbols-outlined icon-brand">school</span>
-                <h1>Sugar Mommy Planner</h1>
+            <!-- Título Dinâmico -->
+            <div class="brand" id="header-brand">
+                <span class="material-symbols-outlined icon-brand" id="header-brand-icon">school</span>
+                <h1 id="header-title">Sugar Mommy Planner</h1>
             </div>
             
-            <div class="toolbar">
-                <button class="btn btn-icon" id="btn-novo" title="Criar Novo Plano">
-                    <span class="material-symbols-outlined">note_add</span>
-                    <span class="btn-label">Novo</span>
+            <!-- Controles do Cronograma (Ocultos por padrão, exibidos pelo JS) -->
+            <div class="week-nav-controls top-week-controls hidden" id="header-week-controls">
+                <button class="btn btn-secondary btn-icon" id="btn-prev-week-top" title="Semana Anterior">
+                    <span class="material-symbols-outlined">chevron_left</span>
                 </button>
-                <button class="btn btn-icon" id="btn-abrir" title="Abrir Plano (JSON)">
-                    <span class="material-symbols-outlined">folder_open</span>
-                    <span class="btn-label">Abrir</span>
-                </button>
-                <button class="btn btn-primary btn-icon" id="btn-salvar" title="Salvar Backup (JSON)">
-                    <span class="material-symbols-outlined">save</span>
-                    <span class="btn-label">Salvar Rascunho</span>
+                <div class="week-label-container">
+                    <span id="week-label-text-top">Semana Atual</span>
+                </div>
+                <button class="btn btn-secondary btn-icon" id="btn-next-week-top" title="Próxima Semana">
+                    <span class="material-symbols-outlined">chevron_right</span>
                 </button>
             </div>
         </header>
@@ -62,7 +61,7 @@
                 <ul class="nav-menu">
                     <li class="nav-item active" data-target="view-dashboard">
                         <span class="material-symbols-outlined">dashboard</span>
-                        <span class="nav-label">Dashboard</span>
+                        <span class="nav-label">Progresso</span>
                     </li>
                     <li class="nav-item" data-target="view-schedule">
                         <span class="material-symbols-outlined">calendar_month</span>
@@ -70,7 +69,7 @@
                     </li>
                     <li class="nav-item" data-target="view-plan">
                         <span class="material-symbols-outlined">format_list_numbered</span>
-                        <span class="nav-label">Meu Plano</span>
+                        <span class="nav-label">Matérias</span>
                     </li>
                     <li class="nav-item" data-target="view-diary">
                         <span class="material-symbols-outlined">edit_calendar</span>
@@ -90,13 +89,13 @@
             <main id="main-content">
 
                 <!-- ----------------------------------------------------------- -->
-                <!-- SEÇÃO 4.1: VIEW DASHBOARD -->
-                <!-- Tela inicial com resumo, viabilidade e gráficos -->
+                <!-- SEÇÃO 4.1: VIEW PROGRESSO -->
+                <!-- Tela inicial com Greeting Card, resumo e gráficos -->
                 <!-- ----------------------------------------------------------- -->
                 <section id="view-dashboard" class="view active">
-                    <header class="view-header">
-                        <h2>Dashboard</h2>
-                        <p class="subtitle">Visão geral do seu progresso e métricas de desempenho.</p>
+                    <header class="view-header greeting-card">
+                        <h2 id="greeting-text">Olá! ☀️</h2>
+                        <p id="greeting-status" class="subtitle">Carregando sua rotina de hoje...</p>
                     </header>
 
                     <div class="dashboard-grid">
@@ -154,19 +153,20 @@
                 <!-- O novo Kanban Board integrado com Linha do Tempo -->
                 <!-- ----------------------------------------------------------- -->
                 <section id="view-schedule" class="view hidden">
-                    <header class="view-header flex-between" style="flex-wrap: wrap; gap: 16px;">
+                    <header class="view-header flex-between inner-schedule-header" style="flex-wrap: wrap; gap: 16px;">
                         <div>
                             <h2>Cronograma de Estudo</h2>
                             <p class="subtitle">Sua semana em um piscar de olhos. Clique nos cartões para realizar suas sessões.</p>
                         </div>
-                        <div class="week-nav-controls">
-                            <button class="btn btn-secondary btn-icon" id="btn-prev-week" title="Semana Anterior">
+                        <!-- Controles Exclusivos do Desktop -->
+                        <div class="week-nav-controls inner-week-controls">
+                            <button class="btn btn-secondary btn-icon" id="btn-prev-week-inner" title="Semana Anterior">
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
                             <div class="week-label-container">
-                                <span id="week-label-text">Semana Atual</span>
+                                <span id="week-label-text-inner">Semana Atual</span>
                             </div>
-                            <button class="btn btn-secondary btn-icon" id="btn-next-week" title="Próxima Semana">
+                            <button class="btn btn-secondary btn-icon" id="btn-next-week-inner" title="Próxima Semana">
                                 <span class="material-symbols-outlined">chevron_right</span>
                             </button>
                         </div>
@@ -185,7 +185,7 @@
                 <section id="view-plan" class="view hidden">
                     <header class="view-header flex-between">
                         <div>
-                            <h2>Meu Plano</h2>
+                            <h2>Matérias</h2>
                             <p class="subtitle">Cadastre suas matérias e arraste (☰) para definir a ordem de prioridade na fila.</p>
                         </div>
                         <button class="btn btn-primary desktop-btn" id="btn-add-materia">
@@ -231,7 +231,7 @@
                             <p class="subtitle">Histórico de suas atividades. O cronograma se ajusta com base nisso.</p>
                         </div>
                         <button class="btn btn-primary desktop-btn" id="btn-add-registro">
-                            <span class="material-symbols-outlined">add</span> Registro Manual
+                            <span class="material-symbols-outlined">add</span> Adicionar Estudo
                         </button>
                     </header>
 
@@ -287,28 +287,20 @@
                 </section>
 
                 <!-- ----------------------------------------------------------- -->
-                <!-- SEÇÃO 4.5: VIEW CONFIGURAÇÕES (ASSISTENTE WIZARD) -->
-                <!-- Parâmetros que guiam o motor lógico do cronograma -->
+                <!-- SEÇÃO 4.5: VIEW CONFIGURAÇÕES -->
+                <!-- Painel de Preferências e Regras do Aplicativo -->
                 <!-- ----------------------------------------------------------- -->
                 <section id="view-config" class="view hidden">
                     <header class="view-header">
-                        <h2>Assistente de Configuração</h2>
-                        <p class="subtitle">Defina as regras do jogo. A <strong>Sugar Mommy</strong> fará as contas por você.</p>
+                        <h2>Configurações</h2>
+                        <p class="subtitle">Personalize a sua rotina e as metas do planejamento.</p>
                     </header>
-
-                    <!-- Stepper Visual -->
-                    <div class="stepper mb-3">
-                        <div class="step active"><span class="step-num">1</span> Limites e Metas</div>
-                        <div class="step-line"></div>
-                        <div class="step active"><span class="step-num">2</span> Rotina Semanal</div>
-                        <div class="step-line"></div>
-                        <div class="step"><span class="step-num">3</span> Salvar</div>
-                    </div>
 
                     <form id="form-config">
                         
-                        <!-- Passo 1: Limites e Ritmo -->
+                        <!-- Card 1: Período e Limites -->
                         <div class="card">
+                            <h3 class="form-section-title mt-0 mb-3" style="font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">1. Período e Limites</h3>
                             <div class="form-row">
                                 <div class="form-group stretch">
                                     <label for="cfg-data-inicio">Data de Início do Plano</label>
@@ -319,21 +311,25 @@
                                     <input type="date" id="cfg-data-fim" required>
                                 </div>
                                 <div class="form-group stretch">
-                                    <label for="cfg-max-materias">Máximo de Matérias Ativas</label>
-                                    <input type="number" id="cfg-max-materias" min="1" max="3" value="3" required inputmode="numeric" pattern="[0-9]*">
+                                    <label for="cfg-max-materias">Matérias Simultâneas</label>
+                                    <input type="number" id="cfg-max-materias" min="1" max="5" value="3" required inputmode="numeric" pattern="[0-9]*">
                                 </div>
                             </div>
-                            
-                            <div class="form-row mt-3 align-center">
+                        </div>
+
+                        <!-- Card 2: Formato da Sessão -->
+                        <div class="card">
+                            <h3 class="form-section-title mt-0 mb-3" style="font-size: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">2. Formato de Sessão</h3>
+                            <div class="form-row align-center">
                                 <div class="form-group stretch">
-                                    <label for="cfg-minutos-sessao">Duração da Sessão (minutos)</label>
+                                    <label for="cfg-minutos-sessao">Duração da Sessão de Teoria</label>
                                     <div class="slider-group">
                                         <input type="range" id="cfg-minutos-sessao" class="custom-slider" min="30" max="120" step="15" value="60">
                                         <span id="out-minutos" class="slider-output">60 min</span>
                                     </div>
                                 </div>
                                 <div class="form-group stretch">
-                                    <label for="cfg-questoes-sessao">Questões por Sessão</label>
+                                    <label for="cfg-questoes-sessao">Metas de Questões por Sessão</label>
                                     <div class="slider-group">
                                         <input type="range" id="cfg-questoes-sessao" class="custom-slider" min="10" max="100" step="5" value="20">
                                         <span id="out-questoes" class="slider-output">15 q.</span>
@@ -342,140 +338,125 @@
                             </div>
                         </div>
 
-                        <!-- Passo 2: A Matriz Semanal -->
+                        <!-- Card 3: Matriz Semanal (Lista Nativa) -->
                         <div class="card" id="matriz-semanal-container">
-                            <h3 class="form-section-title mt-0 mb-2">Sua Rotina Semanal</h3>
+                            <h3 class="form-section-title mt-0 mb-2" style="font-size: 16px;">3. Rotina Semanal</h3>
+                            <p class="text-sm text-muted mb-3">Defina o foco principal e a quantidade de sessões para cada dia da semana.</p>
                             
-                            <!-- Segunda -->
-                            <div class="day-card">
-                                <div class="day-header">Segunda-feira</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-seg-tipo" value="teoria" checked> Teoria</label>
-                                        <label><input type="radio" name="cfg-seg-tipo" value="questoes"> Questões</label>
-                                        <label><input type="radio" name="cfg-seg-tipo" value="manutencao"> Revisão</label>
-                                        <label><input type="radio" name="cfg-seg-tipo" value="descanso"> Descanso</label>
+                            <div class="settings-list">
+                                <!-- Segunda -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Segunda</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-seg-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-seg-slots" min="0" value="3" class="input-compact" inputmode="numeric">
                                     </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-seg-slots" min="0" value="3" inputmode="numeric" pattern="[0-9]*">
+                                </div>
+                                <!-- Terça -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Terça</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-ter-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-ter-slots" min="0" value="3" class="input-compact" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <!-- Quarta -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Quarta</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-qua-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-qua-slots" min="0" value="3" class="input-compact" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <!-- Quinta -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Quinta</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-qui-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-qui-slots" min="0" value="3" class="input-compact" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <!-- Sexta -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Sexta</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-sex-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-sex-slots" min="0" value="3" class="input-compact" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <!-- Sábado -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Sábado</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-sab-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-sab-slots" min="0" value="3" class="input-compact" inputmode="numeric">
+                                    </div>
+                                </div>
+                                <!-- Domingo -->
+                                <div class="settings-row">
+                                    <div class="settings-label">Domingo</div>
+                                    <div class="settings-controls">
+                                        <select id="cfg-dom-tipo" class="select-compact">
+                                            <option value="teoria">Teoria</option><option value="questoes">Questões</option><option value="manutencao">Revisão</option><option value="descanso">Descanso</option>
+                                        </select>
+                                        <input type="number" id="cfg-dom-slots" min="0" value="0" class="input-compact" inputmode="numeric">
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- Terça -->
-                            <div class="day-card">
-                                <div class="day-header">Terça-feira</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-ter-tipo" value="teoria" checked> Teoria</label>
-                                        <label><input type="radio" name="cfg-ter-tipo" value="questoes"> Questões</label>
-                                        <label><input type="radio" name="cfg-ter-tipo" value="manutencao"> Revisão</label>
-                                        <label><input type="radio" name="cfg-ter-tipo" value="descanso"> Descanso</label>
-                                    </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-ter-slots" min="0" value="3" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Quarta -->
-                            <div class="day-card">
-                                <div class="day-header">Quarta-feira</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-qua-tipo" value="teoria" checked> Teoria</label>
-                                        <label><input type="radio" name="cfg-qua-tipo" value="questoes"> Questões</label>
-                                        <label><input type="radio" name="cfg-qua-tipo" value="manutencao"> Revisão</label>
-                                        <label><input type="radio" name="cfg-qua-tipo" value="descanso"> Descanso</label>
-                                    </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-qua-slots" min="0" value="3" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Quinta -->
-                            <div class="day-card">
-                                <div class="day-header">Quinta-feira</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-qui-tipo" value="teoria" checked> Teoria</label>
-                                        <label><input type="radio" name="cfg-qui-tipo" value="questoes"> Questões</label>
-                                        <label><input type="radio" name="cfg-qui-tipo" value="manutencao"> Revisão</label>
-                                        <label><input type="radio" name="cfg-qui-tipo" value="descanso"> Descanso</label>
-                                    </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-qui-slots" min="0" value="3" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Sexta -->
-                            <div class="day-card">
-                                <div class="day-header">Sexta-feira</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-sex-tipo" value="teoria"> Teoria</label>
-                                        <label><input type="radio" name="cfg-sex-tipo" value="questoes" checked> Questões</label>
-                                        <label><input type="radio" name="cfg-sex-tipo" value="manutencao"> Revisão</label>
-                                        <label><input type="radio" name="cfg-sex-tipo" value="descanso"> Descanso</label>
-                                    </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-sex-slots" min="0" value="3" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Sábado -->
-                            <div class="day-card">
-                                <div class="day-header">Sábado</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-sab-tipo" value="teoria"> Teoria</label>
-                                        <label><input type="radio" name="cfg-sab-tipo" value="questoes"> Questões</label>
-                                        <label><input type="radio" name="cfg-sab-tipo" value="manutencao" checked> Revisão</label>
-                                        <label><input type="radio" name="cfg-sab-tipo" value="descanso"> Descanso</label>
-                                    </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-sab-slots" min="0" value="3" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Domingo -->
-                            <div class="day-card">
-                                <div class="day-header">Domingo</div>
-                                <div class="day-controls">
-                                    <div class="segmented-control">
-                                        <label><input type="radio" name="cfg-dom-tipo" value="teoria"> Teoria</label>
-                                        <label><input type="radio" name="cfg-dom-tipo" value="questoes"> Questões</label>
-                                        <label><input type="radio" name="cfg-dom-tipo" value="manutencao"> Revisão</label>
-                                        <label><input type="radio" name="cfg-dom-tipo" value="descanso" checked> Descanso</label>
-                                    </div>
-                                    <div class="slots-input">
-                                        <label>Sessões:</label>
-                                        <input type="number" id="cfg-dom-slots" min="0" value="0" inputmode="numeric" pattern="[0-9]*">
-                                    </div>
-                                </div>
-                            </div>
+                            <!-- Área do Alerta -->
+                            <div id="alerta-matriz" class="alert-danger hidden mt-3"></div>
                         </div>
-
-                        <!-- Área do Alerta -->
-                        <div id="alerta-matriz" class="alert-danger hidden mb-2"></div>
-
-                        <div class="form-actions mt-3 flex-between">
-                            <span class="text-sm text-muted">Tudo pronto? Salve para recalcular a fila.</span>
-                            <button type="submit" id="btn-salvar-config" class="btn btn-primary btn-min-w">
-                                <span class="material-symbols-outlined">save</span> Salvar Alterações
+                        
+                        <!-- Ação do Formulário (Estática e Estável) -->
+                        <div class="mt-3 mb-4">
+                            <button type="submit" id="btn-salvar-config" class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 15px; justify-content: center;">
+                                <span class="material-symbols-outlined">save</span> Salvar Preferências
                             </button>
                         </div>
+
                     </form>
+                    <br>
+
+                    <!-- Card 4: Minha Conta e Dados (Embrião Fase 4) -->
+                    <!--
+                    <div class="card account-card mb-5">
+                        <div class="account-header">
+                            <div class="avatar-placeholder">
+                                <span class="material-symbols-outlined" style="font-size: 32px;">person</span>
+                            </div>
+                            <div class="account-info">
+                                <h3>Modo Offline</h3>
+                                <p>Sincronização em nuvem desativada</p>
+                            </div>
+                        </div>
+                        
+                        <div class="account-divider">Gerenciamento de Dados Locais</div>
+                        
+                        <div class="form-row">
+                            <button type="button" class="btn btn-secondary stretch bg-white" id="btn-novo">
+                                <span class="material-symbols-outlined">delete_sweep</span> Apagar Tudo
+                            </button>
+                            <button type="button" class="btn btn-secondary stretch bg-white" id="btn-abrir">
+                                <span class="material-symbols-outlined">file_upload</span> Restaurar JSON
+                            </button>
+                            <button type="button" class="btn btn-secondary stretch bg-white" id="btn-salvar">
+                                <span class="material-symbols-outlined">download</span> Baixar Backup
+                            </button>
+                        </div>
+                    </div>
+                -->
                 </section>
 
             </main>
@@ -547,7 +528,7 @@
     <div id="modal-registro" class="modal-overlay hidden">
         <div class="modal-content">
             <header class="modal-header">
-                <h3 id="modal-registro-title">Registro Manual</h3>
+                <h3 id="modal-registro-title">Adicionar Estudo</h3>
                 <button class="btn-close modal-close-btn" data-target="modal-registro">
                     <span class="material-symbols-outlined">close</span>
                 </button>
@@ -577,9 +558,9 @@
                             <label for="reg-tipo">Tipo de Atividade</label>
                             <select id="reg-tipo" required>
                                 <option value="" disabled selected>Selecione o que você fez...</option>
-                                <option value="sessoes">Sessões de Teoria Cumpridas</option>
+                                <option value="sessoes">Sessões de Teoria</option>
                                 <option value="questoes">Questões Respondidas</option>
-                                <option value="manutencao">Sessões de Manutenção</option>
+                                <option value="manutencao">Sessões de Revisão</option>
                             </select>
                         </div>
                         <div class="form-group">

@@ -90,10 +90,14 @@ const DOM = {
     
     /* --- Áreas de Renderização --- */
     kanbanBoardContainer: document.getElementById('kanban-board-container'),
-    weekNavControls: document.querySelector('.week-nav-controls'),
-    btnPrevWeek: document.getElementById('btn-prev-week'),
-    btnNextWeek: document.getElementById('btn-next-week'),
-    weekLabelText: document.getElementById('week-label-text'),
+    
+    /* Controles Híbridos (Desktop/Mobile) */
+    btnPrevWeekTop: document.getElementById('btn-prev-week-top'),
+    btnNextWeekTop: document.getElementById('btn-next-week-top'),
+    weekLabelTextTop: document.getElementById('week-label-text-top'),
+    btnPrevWeekInner: document.getElementById('btn-prev-week-inner'),
+    btnNextWeekInner: document.getElementById('btn-next-week-inner'),
+    weekLabelTextInner: document.getElementById('week-label-text-inner'),
     
     listaMateriasDrag: document.getElementById('lista-materias-drag'),
     tabelaHistoricoBody: document.querySelector('#tabela-historico tbody'),
@@ -167,7 +171,7 @@ const Utils = {
                 if (el.id === 'modal-registro') { 
                     DOM.formRegistro.reset(); 
                     AppContext.editingRegistroId = null;
-                    DOM.modalRegistroTitle.textContent = 'Registro Manual';
+                    DOM.modalRegistroTitle.textContent = 'Adicionar Estudo';
                     document.getElementById('btn-modal-delete-registro')?.classList.add('hidden');
                 }
                 if (el.id === 'modal-confirm') {
@@ -410,15 +414,14 @@ const Views = {
         const dias = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
         dias.forEach(d => {
             if (c.matrizSemanal[d]) {
-                const radio = document.querySelector(`input[name="cfg-${d}-tipo"][value="${c.matrizSemanal[d].tipo}"]`);
-                if (radio) radio.checked = true;
+                document.getElementById(`cfg-${d}-tipo`).value = c.matrizSemanal[d].tipo;
                 document.getElementById(`cfg-${d}-slots`).value = c.matrizSemanal[d].slots;
             }
         });
 
         if (DOM.btnSalvarConfig) {
             DOM.btnSalvarConfig.disabled = true;
-            DOM.btnSalvarConfig.innerHTML = '<span class="material-symbols-outlined">check</span> Configurações Salvas';
+            DOM.btnSalvarConfig.innerHTML = '<span class="material-symbols-outlined">save</span> Salvar Preferências';
             DOM.btnSalvarConfig.classList.remove('btn-success');
             DOM.btnSalvarConfig.classList.add('btn-primary');
         }
@@ -556,7 +559,7 @@ const Views = {
 
         kanbanContainer.innerHTML = '';
 
-        // Intervenção de Onboarding: Se não há matérias, esconde o Kanban e os controles
+        // Intervenção de Onboarding: Se não há matérias, esconde o Kanban
         if (Store.state.materias.length === 0) {
             kanbanContainer.innerHTML = `
                 <div class="onboarding-wrapper" style="margin: 16px auto; max-width: 500px;">
@@ -565,10 +568,7 @@ const Views = {
                     <p>A <strong>assistente particular para os estudos</strong> precisa das suas matérias e metas para conseguir gerar sua semana automaticamente.</p>
                     <button class="btn btn-primary" onclick="Controllers.switchView('view-config')">Ir para Configurações</button>
                 </div>`;
-            if (DOM.weekNavControls) DOM.weekNavControls.classList.add('hidden');
             return;
-        } else {
-            if (DOM.weekNavControls) DOM.weekNavControls.classList.remove('hidden');
         }
 
         const classificacao = Logic.classificarFila();
@@ -585,17 +585,19 @@ const Views = {
         const startOfWeek = new Date(segundaFeiraAtual);
         startOfWeek.setDate(segundaFeiraAtual.getDate() + (AppContext.weekOffset * 7));
 
-        if (DOM.weekLabelText) {
-            if (AppContext.weekOffset === 0) DOM.weekLabelText.textContent = "Semana Atual";
-            else if (AppContext.weekOffset === -1) DOM.weekLabelText.textContent = "Semana Passada";
-            else if (AppContext.weekOffset === 1) DOM.weekLabelText.textContent = "Próxima Semana";
-            else {
-                const endOfWeek = new Date(startOfWeek);
-                endOfWeek.setDate(startOfWeek.getDate() + 6);
-                const format = (d) => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
-                DOM.weekLabelText.textContent = `${format(startOfWeek)} a ${format(endOfWeek)}`;
-            }
+        let labelTxt = "";
+        if (AppContext.weekOffset === 0) labelTxt = "Semana Atual";
+        else if (AppContext.weekOffset === -1) labelTxt = "Semana Passada";
+        else if (AppContext.weekOffset === 1) labelTxt = "Próxima Semana";
+        else {
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6);
+            const format = (d) => d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+            labelTxt = `${format(startOfWeek)} a ${format(endOfWeek)}`;
         }
+        
+        if (DOM.weekLabelTextTop) DOM.weekLabelTextTop.textContent = labelTxt;
+        if (DOM.weekLabelTextInner) DOM.weekLabelTextInner.textContent = labelTxt;
 
         const diasSemanaNomes = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
         const startOfWeekStr = startOfWeek.toISOString().split('T')[0];
@@ -726,6 +728,32 @@ const Views = {
 
     renderDashboard() {
         const dashboardGrid = document.querySelector('.dashboard-grid');
+        
+        /* --- Inteligência do Greeting Card --- */
+        const hora = new Date().getHours();
+        let saudacao = 'Boa noite'; let emoji = '🌙';
+        if (hora >= 5 && hora < 12) { saudacao = 'Bom dia'; emoji = '☀️'; }
+        else if (hora >= 12 && hora < 18) { saudacao = 'Boa tarde'; emoji = '☕'; }
+
+        // Calcula a métrica do dia
+        const hojeObj = new Date();
+        const diasSemana = ['dom','seg','ter','qua','qui','sex','sab'];
+        const diaHojeStr = diasSemana[hojeObj.getDay()];
+        const matriz = Store.state.config.matrizSemanal[diaHojeStr];
+        
+        const sessoesPlanejadas = (matriz && matriz.tipo !== 'descanso') ? matriz.slots : 0;
+        const feitasHoje = Store.state.registros.filter(r => r.data === Utils.getTodayStr()).length;
+        const pendentes = Math.max(0, sessoesPlanejadas - feitasHoje);
+
+        let msgStatus = '';
+        if (sessoesPlanejadas === 0) msgStatus = 'Dia de descanso programado. Aproveite! 🏖️';
+        else if (pendentes === 0) msgStatus = 'Incrível! Todas as suas metas de hoje estão concluídas. 🎉';
+        else msgStatus = `Você tem <strong>${pendentes} sessões</strong> programadas para hoje. Vamos nessa?`;
+
+        const greetingEl = document.getElementById('greeting-text');
+        const statusEl = document.getElementById('greeting-status');
+        if (greetingEl) greetingEl.innerHTML = `${saudacao}! ${emoji}`;
+        if (statusEl) statusEl.innerHTML = msgStatus;
         
         // INTERVENÇÃO DE ONBOARDING: Se for a primeira vez do usuário, mostraremos o caminho
         if (Store.state.materias.length === 0) {
@@ -1051,12 +1079,48 @@ const Views = {
         }
     },
 
+    updateHeader() {
+        const currentView = document.querySelector('.view:not(.hidden)');
+        if (!currentView) return;
+        const targetViewId = currentView.id;
+        
+        const titles = {
+            'view-dashboard': 'Progresso',
+            'view-schedule': 'Cronograma',
+            'view-plan': 'Matérias',
+            'view-diary': 'Diário de Estudo',
+            'view-config': 'Configurações'
+        };
+        
+        const headerTitle = document.getElementById('header-title');
+        const headerBrandIcon = document.getElementById('header-brand-icon');
+        const headerWeekControls = document.getElementById('header-week-controls');
+        
+        // A lógica do título é unificada: Sempre define o nome correto
+        if (headerTitle) {
+            headerTitle.classList.remove('hidden');
+            headerTitle.textContent = titles[targetViewId];
+        }
+        
+        if (headerBrandIcon) headerBrandIcon.classList.remove('hidden');
+        
+        // O controle do Topo (Mobile Cronograma) só é injetado se houver matérias
+        if (targetViewId === 'view-schedule' && Store.state.materias.length > 0) {
+            if (headerWeekControls) headerWeekControls.classList.remove('hidden');
+        } else {
+            if (headerWeekControls) headerWeekControls.classList.add('hidden');
+        }
+    },
+
     renderAll() {
         this.renderConfig();
         this.renderPlan();
         this.renderSchedule();
         this.renderDashboard();
         this.renderDiary();
+        
+        // Sempre que o app recalcular a tela, ele acerta o topo de forma unificada
+        this.updateHeader(); 
     }
 };
 
@@ -1140,15 +1204,14 @@ const Controllers = {
         // Event Delegation (Cronograma Kanban)
         DOM.kanbanBoardContainer?.addEventListener('click', this.handleKanbanAction.bind(this));
 
-        // Controles de Navegação da Semana (Kanban)
-        DOM.btnPrevWeek?.addEventListener('click', () => {
-            AppContext.weekOffset -= 1;
-            Views.renderSchedule();
-        });
-        DOM.btnNextWeek?.addEventListener('click', () => {
-            AppContext.weekOffset += 1;
-            Views.renderSchedule();
-        });
+        // Controles Híbridos de Navegação da Semana (Kanban)
+        const prevWeekAction = () => { AppContext.weekOffset -= 1; Views.renderSchedule(); };
+        const nextWeekAction = () => { AppContext.weekOffset += 1; Views.renderSchedule(); };
+        
+        DOM.btnPrevWeekTop?.addEventListener('click', prevWeekAction);
+        DOM.btnNextWeekTop?.addEventListener('click', nextWeekAction);
+        DOM.btnPrevWeekInner?.addEventListener('click', prevWeekAction);
+        DOM.btnNextWeekInner?.addEventListener('click', nextWeekAction);
 
         // "Drag to Scroll" (Arrastar para rolar no Desktop)
         const kanbanBoard = DOM.kanbanBoardContainer;
@@ -1201,6 +1264,9 @@ const Controllers = {
         const targetView = document.getElementById(targetViewId);
         
         if (currentView === targetView) return;
+        
+        // Avisa ao Motor CSS Híbrido em qual tela estamos
+        document.body.setAttribute('data-view', targetViewId);
 
         // Micro-vibração ao clicar na Bottom Navigation (Efeito físico do botão)
         Utils.haptic('light');
@@ -1358,7 +1424,7 @@ const Controllers = {
         document.getElementById('reg-quantidade').value = reg.quantidade;
         document.getElementById('reg-comentario').value = reg.comentario || '';
         
-        DOM.modalRegistroTitle.textContent = 'Editar Registro';
+        DOM.modalRegistroTitle.textContent = 'Editar Estudo';
         Utils.openModal(DOM.modalRegistro);
     },
 
@@ -1392,8 +1458,12 @@ const Controllers = {
 
     /* --- Handlers de Formulários --- */
     handleConfigInput() {
-        DOM.btnSalvarConfig.disabled = false;
-        DOM.btnSalvarConfig.innerHTML = '<span class="material-symbols-outlined">save</span> Salvar Alterações';
+        if (DOM.btnSalvarConfig) {
+            DOM.btnSalvarConfig.disabled = false;
+            DOM.btnSalvarConfig.innerHTML = '<span class="material-symbols-outlined">save</span> Salvar Preferências';
+            DOM.btnSalvarConfig.classList.remove('btn-success');
+            DOM.btnSalvarConfig.classList.add('btn-primary');
+        }
     },
 
     handleConfigSubmit(e) {
@@ -1403,8 +1473,9 @@ const Controllers = {
         const maxMat = Number(document.getElementById('cfg-max-materias').value);
         const dias = ['seg', 'ter', 'qua', 'qui', 'sex', 'sab', 'dom'];
         
+        // Validação da Rotina usando os valores dos <select>
         dias.forEach(d => {
-            const tipo = document.querySelector(`input[name="cfg-${d}-tipo"]:checked`).value;
+            const tipo = document.getElementById(`cfg-${d}-tipo`).value;
             const slots = Number(document.getElementById(`cfg-${d}-slots`).value);
             if (tipo === 'questoes') slotsQ += slots;
         });
@@ -1412,28 +1483,32 @@ const Controllers = {
         DOM.alertaMatriz.classList.add('hidden');
         if (slotsQ > 0 && slotsQ < maxMat) {
             DOM.alertaMatriz.innerHTML = `<strong>Atenção:</strong> Você definiu máximo de ${maxMat} matérias simultâneas, mas sua semana só tem ${slotsQ} sessões de Questões. Cada matéria ativa precisa de pelo menos 1 sessão de questões.`;
+            Utils.haptic('warning');
             DOM.alertaMatriz.classList.remove('hidden');
             return; 
         }
 
+        // Salva Dados Gerais
         Store.state.config.dataInicio = document.getElementById('cfg-data-inicio').value;
         Store.state.config.dataFim = document.getElementById('cfg-data-fim').value;
         Store.state.config.maxMaterias = Number(document.getElementById('cfg-max-materias').value);
         Store.state.config.minutosSessao = Number(document.getElementById('cfg-minutos-sessao').value);
         Store.state.config.questoesSessao = Number(document.getElementById('cfg-questoes-sessao').value);
 
+        // Salva a Matriz Semanal
         dias.forEach(d => {
-            Store.state.config.matrizSemanal[d].tipo = document.querySelector(`input[name="cfg-${d}-tipo"]:checked`).value;
+            Store.state.config.matrizSemanal[d].tipo = document.getElementById(`cfg-${d}-tipo`).value;
             Store.state.config.matrizSemanal[d].slots = Number(document.getElementById(`cfg-${d}-slots`).value);
         });
 
         Store.save();
         Views.renderAll();
 
+        Utils.haptic('success');
         DOM.btnSalvarConfig.classList.remove('btn-primary');
         DOM.btnSalvarConfig.classList.add('btn-success');
-        DOM.btnSalvarConfig.innerHTML = '<span class="material-symbols-outlined">done_all</span> Atualizado!';
-        Utils.showToast('A Sugar Mommy recalculou seu plano.', 'success');
+        DOM.btnSalvarConfig.innerHTML = '<span class="material-symbols-outlined">done_all</span> Preferências Salvas!';
+        Utils.showToast('Configurações atualizadas com sucesso.', 'success');
 
         setTimeout(() => Views.renderConfig(), 2000);
     },
@@ -1477,7 +1552,7 @@ const Controllers = {
             Utils.showToast('Registro atualizado.', 'success');
         } else {
             Store.state.registros.push(dadosRegistro);
-            Utils.showToast('Registro manual salvo.', 'success');
+            Utils.showToast('Registro de estudo salvo.', 'success');
         }
 
         Store.save();
