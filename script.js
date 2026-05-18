@@ -728,7 +728,43 @@ const Views = {
 
     renderDashboard() {
         const dashboardGrid = document.querySelector('.dashboard-grid');
+        const greetingHeader = document.querySelector('.greeting-card');
         
+        // INTERVENÇÃO DE ONBOARDING: Se for a primeira vez do usuário, mostraremos o caminho
+        if (Store.state.materias.length === 0) {
+            dashboardGrid.classList.add('hidden');
+            if (greetingHeader) greetingHeader.classList.add('hidden'); // Oculta o Greeting
+            
+            let onboardingEl = document.getElementById('dashboard-onboarding');
+            if (!onboardingEl) {
+                onboardingEl = document.createElement('div');
+                onboardingEl.id = 'dashboard-onboarding';
+                onboardingEl.className = 'onboarding-wrapper';
+                onboardingEl.innerHTML = `
+                    <span class="material-symbols-outlined empty-icon" style="font-size: 64px; color: var(--color-primary); opacity: 1; margin-bottom: 16px;">rocket_launch</span>
+                    <h3>Bem-vindo ao Sugar Mommy Planner!</h3>
+                    <p>Sua assistente particular para os estudos. Notei que seu plano ainda não foi configurado. Vamos dar o primeiro passo?</p>
+                    <div class="onboarding-actions">
+                        <button class="btn btn-primary btn-min-w" onclick="Controllers.switchView('view-config')">
+                            <span class="material-symbols-outlined">settings</span> 1. Configurar Minha Rotina
+                        </button>
+                        <button class="btn btn-secondary btn-min-w" onclick="Controllers.switchView('view-plan')">
+                            <span class="material-symbols-outlined">add</span> 2. Adicionar Matérias
+                        </button>
+                    </div>
+                `;
+                dashboardGrid.parentNode.insertBefore(onboardingEl, dashboardGrid);
+            } else {
+                onboardingEl.classList.remove('hidden');
+            }
+            return; 
+        } else {
+            dashboardGrid.classList.remove('hidden');
+            if (greetingHeader) greetingHeader.classList.remove('hidden'); // Revela o Greeting
+            const existingOnboarding = document.getElementById('dashboard-onboarding');
+            if (existingOnboarding) existingOnboarding.classList.add('hidden');
+        }
+
         /* --- Inteligência do Greeting Card --- */
         const hora = new Date().getHours();
         let saudacao = 'Boa noite'; let emoji = '🌙';

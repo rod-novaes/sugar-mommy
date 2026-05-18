@@ -749,42 +749,43 @@ tr:last-child td { border-bottom: none; }
         overflow-x: hidden; 
     }
 
-    /* Header (Tinted Glassmorphism - Premium App Bar) */
+    /* Header (Frosted Glass - Padrão Nativo Leve) */
     #top-header { 
         display: flex; 
-        position: fixed; /* Descola da página, permitindo que o conteúdo role por trás */
+        position: fixed; 
         top: 0; left: 0; right: 0;
-        height: calc(64px + env(safe-area-inset-top)); 
+        height: calc(56px + env(safe-area-inset-top)); /* Mais fina e elegante */
         padding: env(safe-area-inset-top) 16px 0 16px;
         justify-content: center; 
         align-items: center;
-        background-color: #3B82F6; /* Azul Primário com 90% de opacidade */
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px); /* Suporte essencial para iOS */
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        background-color: rgba(255, 255, 255, 0.85); /* Branco translúcido */
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05); /* Linha fina de separação em vez de sombra dura */
+        box-shadow: none;
         z-index: 1000;
     }
     
     .brand h1 { 
         display: block; 
-        font-size: 18px; 
-        color: #FFFFFF; /* Contraste absoluto e brilhante */
+        font-size: 17px; 
+        color: var(--text-main); /* Volta para a cor escura elegante */
         font-weight: 600;
-        letter-spacing: 0.5px;
+        letter-spacing: -0.3px;
     } 
     .brand .icon-brand { display: none; }
 
-    /* Estilização dos Botões do Cronograma para brilharem no fundo Azul */
-    #top-header .week-label-container { color: #FFFFFF; font-weight: 600; }
+    /* Estilização dos Botões do Cronograma no Topo Claro */
+    #top-header .week-label-container { color: var(--text-main); font-weight: 600; font-size: 14px; }
     #top-header .btn-secondary { 
-        background-color: rgba(255, 255, 255, 0.2); /* Fundo branco translúcido */
-        color: #FFFFFF; 
-        border: 1px solid rgba(255, 255, 255, 0.1); 
+        background-color: transparent; 
+        color: var(--text-muted); 
+        border: none; 
     }
-    #top-header .btn-secondary:active { background-color: rgba(255, 255, 255, 0.35); }
+    #top-header .btn-secondary:active { background-color: rgba(0, 0, 0, 0.05); }
     
-    /* Esconde os itens do Desktop da Bottom Navigation Mobile */
-    .sidebar-brand, .sidebar-footer { display: none !important; }
+    /* Blindagem Absoluta: Remove a marca e o footer da barra inferior do celular */
+    #sidebar .sidebar-brand, #sidebar .sidebar-footer { display: none !important; width: 0; height: 0; padding: 0; margin: 0; overflow: hidden; }
     
     /* Engine Mobile do Cronograma: Ativa o controle do topo e desativa o título do app */
     body[data-view="view-schedule"] .brand h1 { display: none; }
@@ -910,8 +911,12 @@ tr:last-child td { border-bottom: none; }
         overflow: hidden; 
     }
 
+    /* Empty State: Garante que as mensagens de vazio apareçam e não sejam esmagadas pela tabela */
+    tr.empty-state { display: block !important; border: none !important; background: transparent !important; box-shadow: none !important; padding: 32px 0; }
+    tr.empty-state td { display: block; width: 100%; padding: 0; text-align: center; }
+
     /* Layout Específico: Card do Meu Plano (Clicável, Integral e 2 Linhas) */
-    #tabela-materias tr:not(.empty-state, .row-cut-off) { 
+    #tabela-materias tr:not(.empty-state, .row-cut-off) {
         display: grid; 
         grid-template-columns: 44px 1fr auto; 
         grid-template-rows: auto auto; 
